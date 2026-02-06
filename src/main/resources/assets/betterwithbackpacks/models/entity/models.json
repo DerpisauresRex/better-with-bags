@@ -1,0 +1,6 @@
+{
+  "model_paths": [
+    "/assets/betterwithbackpacks/models/entity/backpack.geo.json",
+    "/assets/betterwithbackpacks/models/entity/backpack_placed.geo.json"
+  ]
+}
