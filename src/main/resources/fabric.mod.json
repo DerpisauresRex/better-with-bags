@@ -1,0 +1,46 @@
+{
+	"schemaVersion": 1,
+	"id": "betterwithbackpacks",
+	"version": "${version}",
+	"name": "Better With Backpacks",
+	"description": "Simple backpacks that extend player inventory when worn as chestplate armor",
+	"authors": [
+		"SajmonOriginal"
+	],
+	"contact": {
+		"sources": "https://github.com/SajmonOriginal/better-with-backpacks"
+	},
+	"license": "MIT",
+	"icon": "icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.sajmonoriginal.betterwithbackpacks.BetterWithBackpacksMod"
+		],
+		"beforeGameStart": [
+			"com.sajmonoriginal.betterwithbackpacks.BetterWithBackpacksMod"
+		],
+		"client": [
+			"com.sajmonoriginal.betterwithbackpacks.BetterWithBackpacksClientMod"
+		],
+		"afterClientStart": [
+			"com.sajmonoriginal.betterwithbackpacks.BetterWithBackpacksClientMod"
+		],
+		"initModels": [
+			"com.sajmonoriginal.betterwithbackpacks.BackpackModels"
+		],
+		"recipesReady": [
+			"com.sajmonoriginal.betterwithbackpacks.BackpackRecipes"
+		]
+	},
+	"mixins": [
+		"betterwithbackpacks.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=${fabricloader}",
+		"halplibe": "*",
+		"dragonfly": ">=${dragonfly}",
+		"minecraft": "*",
+		"java": ">=${java}"
+	}
+}
