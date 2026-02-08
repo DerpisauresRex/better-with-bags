@@ -25,12 +25,10 @@ public class BackpackItems {
         }
         initialized = true;
 
-        BetterWithBagsMod.LOGGER.info("Registering SMALL with ID {}", currentId);
         BACKPACK_SMALL = new ItemBuilder(BetterWithBagsMod.MOD_ID)
             .setStackSize(1)
             .build(new ItemBackpack("backpack.small", itemKey("backpack_small"), currentId++, BackpackTier.SMALL));
 
-        BetterWithBagsMod.LOGGER.info("Registering MEDIUM with ID {}", currentId);
         BACKPACK_MEDIUM = new ItemBuilder(BetterWithBagsMod.MOD_ID)
             .setStackSize(1)
             .build(new ItemBackpack("backpack.medium", itemKey("backpack_medium"), currentId++, BackpackTier.MEDIUM));
@@ -46,8 +44,6 @@ public class BackpackItems {
         BACKPACK_NETHER = new ItemBuilder(BetterWithBagsMod.MOD_ID)
             .setStackSize(1)
             .build(new ItemBackpack("backpack.nether", itemKey("backpack_nether"), currentId++, BackpackTier.NETHER));
-
-        BetterWithBagsMod.LOGGER.info("Registered 5 backpack items starting at ID {}", BetterWithBagsMod.itemIdStart);
     }
 
     public static Item getItemForTier(BackpackTier tier) {

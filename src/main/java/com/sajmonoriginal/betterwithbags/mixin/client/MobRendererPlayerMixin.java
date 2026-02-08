@@ -1,24 +1,16 @@
 package com.sajmonoriginal.betterwithbags.mixin.client;
 
-import com.sajmonoriginal.betterwithbags.config.BackpackPositionConfig;
-import com.sajmonoriginal.betterwithbags.config.BackpackPositionConfig.TierTransform;
 import com.sajmonoriginal.betterwithbags.item.BackpackTier;
 import com.sajmonoriginal.betterwithbags.item.ItemBackpack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.block.model.BlockModel;
-import net.minecraft.client.render.block.model.BlockModelDispatcher;
 import net.minecraft.client.render.entity.MobRenderer;
 import net.minecraft.client.render.entity.MobRendererPlayer;
 import net.minecraft.client.render.model.ModelBase;
 import net.minecraft.client.render.model.ModelBiped;
 import net.minecraft.client.render.tessellator.Tessellator;
-import net.minecraft.client.render.texture.stitcher.TextureRegistry;
-import net.minecraft.core.block.Block;
-import net.minecraft.core.block.Blocks;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.ItemStack;
-import net.minecraft.core.item.block.ItemBlock;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.spongepowered.asm.mixin.Mixin;
@@ -75,20 +67,15 @@ public abstract class MobRendererPlayerMixin extends MobRenderer<Player> {
 
         this.renderDispatcher.textureManager.loadTexture(bwb$getTexture(tier)).bind();
 
-        BackpackPositionConfig.tick();
-        TierTransform t = BackpackPositionConfig.get(tier);
-
         float bodyYaw = modelBipedMain.body.yRot;
         float bodyPitch = modelBipedMain.body.xRot;
         GL11.glRotatef(bodyYaw * (180F / (float) Math.PI), 0.0F, 1.0F, 0.0F);
         GL11.glRotatef(bodyPitch * (180F / (float) Math.PI), 1.0F, 0.0F, 0.0F);
 
-        float s = t.scale;
+        float s = 0.0625F;
         GL11.glScalef(s, s, s);
-        GL11.glTranslatef(t.translateX, t.translateY, t.translateZ);
-        GL11.glRotatef(t.rotateX, 1.0F, 0.0F, 0.0F);
-        GL11.glRotatef(t.rotateY, 0.0F, 1.0F, 0.0F);
-        GL11.glRotatef(t.rotateZ, 0.0F, 0.0F, 1.0F);
+        GL11.glTranslatef(0.0F, 24.6F, 0.0F);
+        GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
 
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         GL11.glEnable(GL11.GL_BLEND);
