@@ -3,9 +3,13 @@
 	"id": "betterwithbackpacks",
 	"version": "${version}",
 	"name": "Better With Backpacks",
-	"description": "Simple backpacks that extend player inventory when worn as chestplate armor",
+	"description": "Craftable backpacks you can wear, place in the world, and upgrade through multiple tiers.",
 	"authors": [
 		"SajmonOriginal"
+	],
+	"contributors": [
+		"badsbee",
+		"Sour Zombo"
 	],
 	"contact": {
 		"sources": "https://github.com/SajmonOriginal/better-with-backpacks"
