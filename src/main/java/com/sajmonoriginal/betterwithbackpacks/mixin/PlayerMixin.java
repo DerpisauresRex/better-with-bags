@@ -1,7 +1,6 @@
 package com.sajmonoriginal.betterwithbackpacks.mixin;
 
 import com.sajmonoriginal.betterwithbackpacks.item.ItemBackpack;
-import com.sajmonoriginal.betterwithbackpacks.util.MeshHotbarCapable;
 import net.minecraft.core.entity.Entity;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.ItemStack;
@@ -26,36 +25,9 @@ public abstract class PlayerMixin extends Entity {
         super(world);
     }
 
-    @Inject(method = "dropCurrentItem", at = @At("HEAD"), cancellable = true)
-    private void bwb$dropMeshItem(boolean dropAll, CallbackInfo ci) {
-        MeshHotbarCapable mesh = (MeshHotbarCapable) this.inventory;
-        if (mesh.betterWithBackpacks$getMeshSelected() <= 0) return;
-
-        int maxCount = dropAll ? 64 : 1;
-        ItemStack dropped = mesh.betterWithBackpacks$removeMeshItem(maxCount);
-        if (dropped != null) {
-            this.dropPlayerItemWithRandomChoice(dropped, false);
-        }
-        ci.cancel();
-    }
-
-    @Inject(method = "destroyCurrentEquippedItem", at = @At("HEAD"), cancellable = true)
-    private void bwb$destroyMeshItem(CallbackInfo ci) {
-        MeshHotbarCapable mesh = (MeshHotbarCapable) this.inventory;
-        if (mesh.betterWithBackpacks$getMeshSelected() <= 0) return;
-
-        mesh.betterWithBackpacks$destroyMeshItem();
-        ci.cancel();
-    }
-
     @Inject(method = "onLivingUpdate", at = @At("TAIL"))
-    private void bwb$tickMeshSync(CallbackInfo ci) {
+    private void bwb$applyBackpackSpeedPenalty(CallbackInfo ci) {
         Player self = (Player) (Object) this;
-
-        MeshHotbarCapable mesh = (MeshHotbarCapable) self.inventory;
-        if (mesh.betterWithBackpacks$getMeshSelected() > 0) {
-            mesh.betterWithBackpacks$syncMeshItem();
-        }
 
         ItemStack backpackStack = ItemBackpack.getWornBackpackStack(self);
         if (backpackStack == null) return;

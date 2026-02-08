@@ -6,7 +6,6 @@ import com.sajmonoriginal.betterwithbackpacks.item.BackpackTier;
 import com.sajmonoriginal.betterwithbackpacks.item.ItemBackpack;
 import com.sajmonoriginal.betterwithbackpacks.mixin.accessor.MenuAbstractAccessor;
 import com.sajmonoriginal.betterwithbackpacks.slot.SlotBackpack;
-import com.sajmonoriginal.betterwithbackpacks.slot.SlotMeshPocket;
 import com.sajmonoriginal.betterwithbackpacks.util.BackpackMenuCapable;
 import net.minecraft.core.InventoryAction;
 import net.minecraft.core.entity.player.Player;
@@ -47,16 +46,7 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
     private int bwb$backpackRows = 0;
 
     @Unique
-    private boolean bwb$hasMesh = false;
-
-    @Unique
     private List<SlotBackpack> bwb$backpackSlots = new ArrayList<>();
-
-    @Unique
-    private SlotMeshPocket bwb$meshSlotLeft = null;
-
-    @Unique
-    private SlotMeshPocket bwb$meshSlotRight = null;
 
     @Unique
     private boolean bwb$slotsCreated = false;
@@ -74,11 +64,6 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
     @Override
     public int betterWithBackpacks$getBackpackRows() {
         return this.bwb$backpackRows;
-    }
-
-    @Override
-    public boolean betterWithBackpacks$hasMeshPocket() {
-        return this.bwb$hasMesh;
     }
 
     @Override
@@ -107,7 +92,6 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
 
         this.bwb$hasBackpackSlots = true;
         this.bwb$backpackRows = rows;
-        this.bwb$hasMesh = tier.hasMeshPocket();
 
         for (int i = 0; i < bwb$backpackSlots.size(); i++) {
             SlotBackpack slot = bwb$backpackSlots.get(i);
@@ -119,21 +103,6 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
             } else {
                 slot.x = HIDDEN_Y;
                 slot.y = HIDDEN_Y;
-            }
-        }
-
-        if (bwb$meshSlotLeft != null && bwb$meshSlotRight != null) {
-            if (bwb$hasMesh) {
-                int meshRowY = STANDARD_HEIGHT + 15 + (rows - 2) * ROW_HEIGHT;
-                bwb$meshSlotLeft.x = ContainerBackpack.MESH_LEFT_X;
-                bwb$meshSlotLeft.y = meshRowY;
-                bwb$meshSlotRight.x = ContainerBackpack.MESH_RIGHT_X;
-                bwb$meshSlotRight.y = meshRowY;
-            } else {
-                bwb$meshSlotLeft.x = HIDDEN_Y;
-                bwb$meshSlotLeft.y = HIDDEN_Y;
-                bwb$meshSlotRight.x = HIDDEN_Y;
-                bwb$meshSlotRight.y = HIDDEN_Y;
             }
         }
     }
@@ -150,12 +119,6 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
             ((MenuAbstractAccessor) this).invokeAddSlot(slot);
         }
 
-        bwb$meshSlotLeft = new SlotMeshPocket(inventory, HIDDEN_Y, HIDDEN_Y, 0);
-        ((MenuAbstractAccessor) this).invokeAddSlot(bwb$meshSlotLeft);
-
-        bwb$meshSlotRight = new SlotMeshPocket(inventory, HIDDEN_Y, HIDDEN_Y, 1);
-        ((MenuAbstractAccessor) this).invokeAddSlot(bwb$meshSlotRight);
-
         bwb$slotsCreated = true;
     }
 
@@ -163,19 +126,10 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
     private void hideBackpackSlots() {
         this.bwb$hasBackpackSlots = false;
         this.bwb$backpackRows = 0;
-        this.bwb$hasMesh = false;
 
         for (SlotBackpack slot : bwb$backpackSlots) {
             slot.x = HIDDEN_Y;
             slot.y = HIDDEN_Y;
-        }
-        if (bwb$meshSlotLeft != null) {
-            bwb$meshSlotLeft.x = HIDDEN_Y;
-            bwb$meshSlotLeft.y = HIDDEN_Y;
-        }
-        if (bwb$meshSlotRight != null) {
-            bwb$meshSlotRight.x = HIDDEN_Y;
-            bwb$meshSlotRight.y = HIDDEN_Y;
         }
     }
 

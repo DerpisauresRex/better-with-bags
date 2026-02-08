@@ -14,23 +14,16 @@ import java.util.Collections;
 import java.util.List;
 
 public class ContainerBackpackBlock extends MenuAbstract {
-    public static final int MESH_LEFT_X = -10;
-    public static final int MESH_RIGHT_X = 170;
-
     private final TileEntityBackpack tileEntity;
     private final BackpackTier tier;
     private final int rows;
     private final int capacity;
-    private final boolean hasMesh;
-    private int meshLeftSlotIndex = -1;
-    private int meshRightSlotIndex = -1;
 
     public ContainerBackpackBlock(ContainerInventory playerInventory, TileEntityBackpack tileEntity) {
         this.tileEntity = tileEntity;
         this.tier = tileEntity.getTier();
         this.rows = tier.getRows();
         this.capacity = tier.getSlots();
-        this.hasMesh = tier.hasMeshPocket();
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < 9; col++) {
@@ -39,14 +32,6 @@ public class ContainerBackpackBlock extends MenuAbstract {
                     this.addSlot(new Slot(tileEntity, slotIndex, 8 + col * 18, 18 + row * 18));
                 }
             }
-        }
-
-        if (hasMesh) {
-            int meshY = 18 + (rows - 2) * 18;
-            this.meshLeftSlotIndex = this.slots.size();
-            this.addSlot(new SlotMeshPocketBlock(tileEntity, MESH_LEFT_X, meshY, 0));
-            this.meshRightSlotIndex = this.slots.size();
-            this.addSlot(new SlotMeshPocketBlock(tileEntity, MESH_RIGHT_X, meshY, 1));
         }
 
         int playerInvY = 17 + rows * 18 + 14;
@@ -70,27 +55,10 @@ public class ContainerBackpackBlock extends MenuAbstract {
         return tier;
     }
 
-    public boolean hasMeshPocket() {
-        return hasMesh;
-    }
-
-    public int getMeshLeftSlotIndex() {
-        return meshLeftSlotIndex;
-    }
-
-    public int getMeshRightSlotIndex() {
-        return meshRightSlotIndex;
-    }
-
-    private boolean isMeshSlot(int index) {
-        return hasMesh && (index == meshLeftSlotIndex || index == meshRightSlotIndex);
-    }
-
     @Override
     public List<Integer> getMoveSlots(InventoryAction action, Slot slot, int target, Player player) {
-        int meshCount = hasMesh ? 2 : 0;
-        int playerStart = capacity + meshCount;
-        if (slot.index < capacity || isMeshSlot(slot.index)) {
+        int playerStart = capacity;
+        if (slot.index < capacity) {
             return this.getSlots(slot.index, 1, false);
         }
         if (action == InventoryAction.MOVE_ALL) {
@@ -106,9 +74,8 @@ public class ContainerBackpackBlock extends MenuAbstract {
 
     @Override
     public List<Integer> getTargetSlots(InventoryAction action, Slot slot, int target, Player player) {
-        int meshCount = hasMesh ? 2 : 0;
-        int playerStart = capacity + meshCount;
-        if (slot.index < capacity || isMeshSlot(slot.index)) {
+        int playerStart = capacity;
+        if (slot.index < capacity) {
             return this.getSlots(playerStart, 36, false);
         }
         if (slot.index >= playerStart) {

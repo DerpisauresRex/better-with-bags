@@ -13,10 +13,8 @@
 		"accessor.MenuAbstractAccessor"
 	],
 	"client": [
-		"client.HudComponentHotbarMixin",
 		"client.MobRendererPlayerMixin",
 		"client.MobRendererPlayerArmorMixin",
-		"client.ModelBipedMixin",
 		"client.ScreenContainerAbstractMixin",
 		"client.ScreenInventoryMixin",
 		"client.ScreenInventoryCreativeMixin"

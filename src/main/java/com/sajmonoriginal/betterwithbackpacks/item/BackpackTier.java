@@ -41,9 +41,4 @@ public enum BackpackTier {
         return this == NETHER;
     }
 
-    public boolean hasMeshPocket() {
-        return this == REINFORCED || this == NETHER;
-    }
-
-
 }

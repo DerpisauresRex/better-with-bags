@@ -78,11 +78,6 @@ public class ItemBackpack extends Item implements IArmorItem {
                     backpackTE.setItem(i, contents[i]);
                 }
             }
-
-            if (this.tier.hasMeshPocket()) {
-                backpackTE.setMeshPocketItem(getMeshPocketItem(itemstack, 0), 0);
-                backpackTE.setMeshPocketItem(getMeshPocketItem(itemstack, 1), 1);
-            }
         }
 
         itemstack.stackSize--;
@@ -195,48 +190,6 @@ public class ItemBackpack extends Item implements IArmorItem {
             if (item != null) return true;
         }
         return false;
-    }
-
-    public static ItemStack getMeshPocketItem(ItemStack backpackStack) {
-        return getMeshPocketItem(backpackStack, 0);
-    }
-
-    public static ItemStack getMeshPocketItem(ItemStack backpackStack, int side) {
-        if (backpackStack == null || !(backpackStack.getItem() instanceof ItemBackpack)) {
-            return null;
-        }
-        String key = side == 0 ? "MeshPocketLeft" : "MeshPocketRight";
-        CompoundTag tag = backpackStack.getData();
-        if (tag.containsKey(key)) {
-            CompoundTag meshTag = tag.getCompound(key);
-            if (meshTag.containsKey("id")) {
-                return ItemStack.readItemStackFromNbt(meshTag);
-            }
-        }
-        if (side == 0 && tag.containsKey("MeshPocketItem")) {
-            CompoundTag meshTag = tag.getCompound("MeshPocketItem");
-            if (meshTag.containsKey("id")) {
-                return ItemStack.readItemStackFromNbt(meshTag);
-            }
-        }
-        return null;
-    }
-
-    public static void setMeshPocketItem(ItemStack backpackStack, ItemStack meshItem) {
-        setMeshPocketItem(backpackStack, meshItem, 0);
-    }
-
-    public static void setMeshPocketItem(ItemStack backpackStack, ItemStack meshItem, int side) {
-        if (backpackStack == null || !(backpackStack.getItem() instanceof ItemBackpack)) {
-            return;
-        }
-        String key = side == 0 ? "MeshPocketLeft" : "MeshPocketRight";
-        CompoundTag tag = backpackStack.getData();
-        CompoundTag meshTag = new CompoundTag();
-        if (meshItem != null) {
-            meshItem.writeToNBT(meshTag);
-        }
-        tag.putCompound(key, meshTag);
     }
 
     public static int getOccupiedSlotCount(ItemStack backpackStack) {

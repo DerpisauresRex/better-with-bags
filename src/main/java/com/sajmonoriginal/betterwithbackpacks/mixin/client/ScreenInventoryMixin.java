@@ -130,12 +130,6 @@ public abstract class ScreenInventoryMixin extends ScreenContainerAbstract {
 
         int panelHeight = EXTENSION_TITLE_HEIGHT + this.bwb$backpackRows * ROW_HEIGHT + EXTENSION_BOTTOM_HEIGHT;
         this.drawTexturedModalRect(guiLeft, panelY, 0, 0, EXTENSION_WIDTH, panelHeight);
-
-        if (this.bwb$currentTier.hasMeshPocket()) {
-            int meshRowY = guiTop + STANDARD_HEIGHT + 15 + (this.bwb$backpackRows - 2) * ROW_HEIGHT;
-            this.drawTexturedModalRect(guiLeft + ContainerBackpack.MESH_LEFT_X - 1, meshRowY - 1, 176, 0, 18, 18);
-            this.drawTexturedModalRect(guiLeft + ContainerBackpack.MESH_RIGHT_X - 1, meshRowY - 1, 176, 0, 18, 18);
-        }
     }
 
     @Inject(method = "drawGuiContainerForegroundLayer", at = @At("TAIL"))

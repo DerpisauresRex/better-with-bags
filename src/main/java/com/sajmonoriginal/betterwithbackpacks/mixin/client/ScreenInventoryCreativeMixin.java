@@ -78,11 +78,5 @@ public abstract class ScreenInventoryCreativeMixin extends ScreenInventory {
 
         int panelHeight = EXTENSION_TITLE_HEIGHT + rows * ROW_HEIGHT + EXTENSION_BOTTOM_HEIGHT;
         this.drawTexturedModalRect(guiLeft, panelY, 0, 0, EXTENSION_WIDTH, panelHeight);
-
-        if (tier.hasMeshPocket()) {
-            int meshRowY = guiTop + STANDARD_HEIGHT + 15 + (rows - 2) * ROW_HEIGHT;
-            this.drawTexturedModalRect(guiLeft + ContainerBackpack.MESH_LEFT_X - 1, meshRowY - 1, 176, 0, 18, 18);
-            this.drawTexturedModalRect(guiLeft + ContainerBackpack.MESH_RIGHT_X - 1, meshRowY - 1, 176, 0, 18, 18);
-        }
     }
 }

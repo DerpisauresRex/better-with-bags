@@ -16,7 +16,6 @@ public class ScreenBackpack extends ScreenContainerAbstract {
     private final ContainerBackpack container;
     private final int rows;
     private final String guiTexture;
-    private final boolean hasMesh;
 
     public ScreenBackpack(ContainerInventory playerInventory, ItemStack backpackStack) {
         super(new ContainerBackpack(playerInventory, backpackStack));
@@ -25,7 +24,6 @@ public class ScreenBackpack extends ScreenContainerAbstract {
         this.ySize = 113 + rows * 18;
         BackpackTier tier = container.getTier();
         this.guiTexture = GUI_TEXTURE_BASE + tier.getName() + ".png";
-        this.hasMesh = tier.hasMeshPocket();
     }
 
     @Override
@@ -39,12 +37,6 @@ public class ScreenBackpack extends ScreenContainerAbstract {
 
         this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, this.xSize, rows * 18 + 17);
         this.drawTexturedModalRect(guiLeft, guiTop + rows * 18 + 17, 0, 126, this.xSize, 96);
-
-        if (hasMesh) {
-            int meshRowY = guiTop + 18 + (rows - 2) * 18;
-            this.drawTexturedModalRect(guiLeft + ContainerBackpack.MESH_LEFT_X - 1, meshRowY - 1, 176, 0, 18, 18);
-            this.drawTexturedModalRect(guiLeft + ContainerBackpack.MESH_RIGHT_X - 1, meshRowY - 1, 176, 0, 18, 18);
-        }
     }
 
     @Override

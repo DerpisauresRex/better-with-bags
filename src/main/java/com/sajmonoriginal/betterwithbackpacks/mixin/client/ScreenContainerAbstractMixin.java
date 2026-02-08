@@ -1,9 +1,6 @@
 package com.sajmonoriginal.betterwithbackpacks.mixin.client;
 
-import com.sajmonoriginal.betterwithbackpacks.gui.SlotMeshPocketBlock;
-import com.sajmonoriginal.betterwithbackpacks.gui.SlotMeshPocketItem;
 import com.sajmonoriginal.betterwithbackpacks.slot.SlotBackpack;
-import com.sajmonoriginal.betterwithbackpacks.slot.SlotMeshPocket;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.container.ScreenContainerAbstract;
@@ -25,10 +22,7 @@ public abstract class ScreenContainerAbstractMixin {
     private void bwb$allowBackpackSlotClicks(int mouseX, int mouseY, CallbackInfoReturnable<Integer> cir) {
         if (cir.getReturnValue() == -999) {
             Slot slot = getSlotAtPosition(mouseX, mouseY);
-            if (slot instanceof SlotBackpack
-                || slot instanceof SlotMeshPocket
-                || slot instanceof SlotMeshPocketItem
-                || slot instanceof SlotMeshPocketBlock) {
+            if (slot instanceof SlotBackpack) {
                 cir.setReturnValue(slot.index);
             }
         }

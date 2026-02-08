@@ -13,34 +13,10 @@ public class TileEntityBackpack extends TileEntity implements Container {
 
     private ItemStack[] contents;
     private BackpackTier tier;
-    private ItemStack meshPocketLeft;
-    private ItemStack meshPocketRight;
 
     public TileEntityBackpack() {
         this.tier = BackpackTier.SMALL;
         this.contents = new ItemStack[tier.getSlots()];
-    }
-
-    public ItemStack getMeshPocketItem() {
-        return meshPocketLeft;
-    }
-
-    public ItemStack getMeshPocketItem(int side) {
-        return side == 0 ? meshPocketLeft : meshPocketRight;
-    }
-
-    public void setMeshPocketItem(ItemStack item) {
-        this.meshPocketLeft = item;
-        setChanged();
-    }
-
-    public void setMeshPocketItem(ItemStack item, int side) {
-        if (side == 0) {
-            this.meshPocketLeft = item;
-        } else {
-            this.meshPocketRight = item;
-        }
-        setChanged();
     }
 
     public BackpackTier getTier() {
@@ -141,24 +117,6 @@ public class TileEntityBackpack extends TileEntity implements Container {
                 }
             }
         }
-
-        if (tag.containsKey("MeshPocketLeft")) {
-            CompoundTag meshTag = tag.getCompound("MeshPocketLeft");
-            if (meshTag.containsKey("id")) {
-                this.meshPocketLeft = ItemStack.readItemStackFromNbt(meshTag);
-            }
-        } else if (tag.containsKey("MeshPocketItem")) {
-            CompoundTag meshTag = tag.getCompound("MeshPocketItem");
-            if (meshTag.containsKey("id")) {
-                this.meshPocketLeft = ItemStack.readItemStackFromNbt(meshTag);
-            }
-        }
-        if (tag.containsKey("MeshPocketRight")) {
-            CompoundTag meshTag = tag.getCompound("MeshPocketRight");
-            if (meshTag.containsKey("id")) {
-                this.meshPocketRight = ItemStack.readItemStackFromNbt(meshTag);
-            }
-        }
     }
 
     @Override
@@ -177,18 +135,6 @@ public class TileEntityBackpack extends TileEntity implements Container {
             }
         }
         tag.put("BackpackInventory", itemList);
-
-        CompoundTag meshLeftTag = new CompoundTag();
-        if (meshPocketLeft != null) {
-            meshPocketLeft.writeToNBT(meshLeftTag);
-        }
-        tag.putCompound("MeshPocketLeft", meshLeftTag);
-
-        CompoundTag meshRightTag = new CompoundTag();
-        if (meshPocketRight != null) {
-            meshPocketRight.writeToNBT(meshRightTag);
-        }
-        tag.putCompound("MeshPocketRight", meshRightTag);
     }
 
     @Override

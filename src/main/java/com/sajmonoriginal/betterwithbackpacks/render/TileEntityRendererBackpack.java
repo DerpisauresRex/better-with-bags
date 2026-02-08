@@ -81,52 +81,5 @@ public class TileEntityRendererBackpack extends TileEntityRenderer<TileEntityBac
         GL11.glDisable(GL12.GL_RESCALE_NORMAL);
 
         GL11.glPopMatrix();
-
-        if (tier.hasMeshPocket()) {
-            ItemStack meshLeft = tileEntity.getMeshPocketItem(0);
-            ItemStack meshRight = tileEntity.getMeshPocketItem(1);
-            if (meshLeft != null && meshLeft.getItem() instanceof ItemBlock) {
-                renderMeshBlock(tessellator, meshLeft, x, y, z, rotation, 1);
-            }
-            if (meshRight != null && meshRight.getItem() instanceof ItemBlock) {
-                renderMeshBlock(tessellator, meshRight, x, y, z, rotation, -1);
-            }
-        }
-    }
-
-    private void renderMeshBlock(Tessellator tessellator, ItemStack meshItem, double x, double y, double z, float rotation, int side) {
-        Block<?> block = Blocks.blocksList[meshItem.itemID];
-        if (block == null) return;
-        BlockModel<?> blockModel = BlockModelDispatcher.getInstance().getDispatch(block);
-        if (blockModel == null) return;
-
-        float meshCenterX = -side * 5.5f;
-        float meshCenterY = 16.25f;
-        float meshCenterZ = 4.5f;
-        float pixelScale = 1.0f / 16.0f;
-        float blockScale = 2.0f;
-
-        TextureRegistry.blockAtlas.bind();
-
-        GL11.glPushMatrix();
-
-        GL11.glTranslatef((float) x + 0.5f, (float) y, (float) z + 0.5f);
-        GL11.glScalef(pixelScale, pixelScale, pixelScale);
-        GL11.glTranslatef(0.0f, -13.5f, 0.0f);
-        GL11.glRotatef(rotation, 0.0f, 1.0f, 0.0f);
-        GL11.glTranslatef(meshCenterX, meshCenterY, meshCenterZ);
-        GL11.glScalef(blockScale, blockScale, blockScale);
-
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-
-        blockModel.renderBlockOnInventory(tessellator, meshItem.getMetadata(), 1.0f, null);
-
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-
-        GL11.glPopMatrix();
     }
 }

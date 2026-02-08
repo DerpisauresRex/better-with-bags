@@ -94,11 +94,6 @@ public class BlockLogicBackpack extends BlockLogic {
         }
         ItemBackpack.setBackpackContents(stack, contents);
 
-        if (tier.hasMeshPocket()) {
-            ItemBackpack.setMeshPocketItem(stack, backpackTE.getMeshPocketItem(0), 0);
-            ItemBackpack.setMeshPocketItem(stack, backpackTE.getMeshPocketItem(1), 1);
-        }
-
         return stack;
     }
 
