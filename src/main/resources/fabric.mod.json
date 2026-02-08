@@ -1,8 +1,8 @@
 {
 	"schemaVersion": 1,
-	"id": "betterwithbackpacks",
+	"id": "betterwithbags",
 	"version": "${version}",
-	"name": "Better With Backpacks",
+	"name": "Better With Bags",
 	"description": "Craftable backpacks you can wear, place in the world, and upgrade through multiple tiers.",
 	"authors": [
 		"SajmonOriginal"
@@ -12,33 +12,33 @@
 		"Sour Zombo"
 	],
 	"contact": {
-		"sources": "https://github.com/SajmonOriginal/better-with-backpacks"
+		"sources": "https://github.com/SajmonOriginal/better-with-bags"
 	},
 	"license": "MIT",
 	"icon": "icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.sajmonoriginal.betterwithbackpacks.BetterWithBackpacksMod"
+			"com.sajmonoriginal.betterwithbags.BetterWithBagsMod"
 		],
 		"beforeGameStart": [
-			"com.sajmonoriginal.betterwithbackpacks.BetterWithBackpacksMod"
+			"com.sajmonoriginal.betterwithbags.BetterWithBagsMod"
 		],
 		"client": [
-			"com.sajmonoriginal.betterwithbackpacks.BetterWithBackpacksClientMod"
+			"com.sajmonoriginal.betterwithbags.BetterWithBagsClientMod"
 		],
 		"afterClientStart": [
-			"com.sajmonoriginal.betterwithbackpacks.BetterWithBackpacksClientMod"
+			"com.sajmonoriginal.betterwithbags.BetterWithBagsClientMod"
 		],
 		"initModels": [
-			"com.sajmonoriginal.betterwithbackpacks.BackpackModels"
+			"com.sajmonoriginal.betterwithbags.BackpackModels"
 		],
 		"recipesReady": [
-			"com.sajmonoriginal.betterwithbackpacks.BackpackRecipes"
+			"com.sajmonoriginal.betterwithbags.BackpackRecipes"
 		]
 	},
 	"mixins": [
-		"betterwithbackpacks.mixins.json"
+		"betterwithbags.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=${fabricloader}",

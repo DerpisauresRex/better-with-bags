@@ -1,0 +1,22 @@
+{
+	"required": true,
+	"package": "com.sajmonoriginal.betterwithbags.mixin",
+	"compatibilityLevel": "JAVA_${java}",
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"mixins": [
+		"EntityItemMixin",
+		"InventoryPlayerMixin",
+		"MenuInventoryMixin",
+		"PlayerMixin",
+		"accessor.MenuAbstractAccessor"
+	],
+	"client": [
+		"client.MobRendererPlayerMixin",
+		"client.MobRendererPlayerArmorMixin",
+		"client.ScreenContainerAbstractMixin",
+		"client.ScreenInventoryMixin",
+		"client.ScreenInventoryCreativeMixin"
+	]
+}

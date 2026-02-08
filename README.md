@@ -1,10 +1,10 @@
-# Better With Backpacks
+# Better With Bags
 
 You know what's annoying? Having 27 stacks of cobblestone, 4 different pickaxes, some redstone you'll "use later," and absolutely nowhere to put any of it. Your inventory is full before you even leave the cave.
 
 **So I made backpacks.**
 
-Better With Backpacks adds wearable, placeable storage to [Better Than Adventure](https://www.betterthanadventure.net/). Craft a small leather satchel, throw it on your back, and suddenly you have room to breathe. Upgrade it as you go. By endgame you're walking around with 36 extra slots strapped to your back. Everything from the recipes to the textures was made to fit the BTA style, so it feels like it was always part of the game.
+Better With Bags adds wearable, placeable storage to [Better Than Adventure](https://www.betterthanadventure.net/). Craft a small leather satchel, throw it on your back, and suddenly you have room to breathe. Upgrade it as you go. By endgame you're walking around with 36 extra slots strapped to your back. Everything from the recipes to the textures was made to fit the BTA style, so it feels like it was always part of the game.
 
 <p align="center">
   <img src="assets/backpacks_placed.png" width="80%" alt="All 5 backpack tiers placed in the world">
