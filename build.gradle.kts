@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.loader)
     implementation(libs.halplibe)
     implementation(libs.dragonfly)
+    include(libs.dragonfly)
     implementation(libs.legacyLwjgl)
 
     implementation(libs.slf4jApi)
