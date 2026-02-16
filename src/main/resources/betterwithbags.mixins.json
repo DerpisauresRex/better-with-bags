@@ -10,13 +10,21 @@
 		"InventoryPlayerMixin",
 		"MenuInventoryMixin",
 		"PlayerMixin",
-		"accessor.MenuAbstractAccessor"
+		"PlayerMixinBagScreens",
+		"SlotSetMixin",
+		"accessor.MenuAbstractAccessor",
+		"accessor.PlayerAccessor"
 	],
 	"client": [
 		"client.MobRendererPlayerMixin",
 		"client.MobRendererPlayerArmorMixin",
+		"client.PacketHandlerClientMixinBackpack",
+		"client.PlayerLocalMixinBagScreens",
 		"client.ScreenContainerAbstractMixin",
 		"client.ScreenInventoryMixin",
 		"client.ScreenInventoryCreativeMixin"
+	],
+	"server": [
+		"server.PlayerServerMixinBagScreens"
 	]
 }
