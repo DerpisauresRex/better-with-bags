@@ -46,6 +46,11 @@ public class BackpackRecipes implements RecipeEntrypoint {
             .addInput('M', Blocks.MESH_GOLD)
             .addInput('B', BackpackItems.BACKPACK_REINFORCED)
             .create("backpack_nether", new ItemStack(BackpackItems.BACKPACK_NETHER, 1));
+
+        RecipeBuilder.Shaped(modId, "LWL", "LWL", "LLL")
+            .addInput('L', Items.LEATHER)
+            .addInput('W', Items.CLOTH)
+            .create("bedroll", new ItemStack(BackpackItems.BEDROLL, 1));
     }
 
     @Override

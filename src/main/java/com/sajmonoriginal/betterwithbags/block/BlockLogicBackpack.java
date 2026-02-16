@@ -17,9 +17,16 @@ import net.minecraft.core.world.World;
 
 public class BlockLogicBackpack extends BlockLogic {
 
-    public BlockLogicBackpack(Block<?> block) {
+    private final BackpackTier tier;
+
+    public BlockLogicBackpack(Block<?> block, BackpackTier tier) {
         super(block, Material.cloth);
+        this.tier = tier;
         setBlockBounds(0.1875, 0.0, 0.1875, 0.8125, 0.625, 0.8125);
+    }
+
+    public BackpackTier getTier() {
+        return tier;
     }
 
     @Override
@@ -68,20 +75,21 @@ public class BlockLogicBackpack extends BlockLogic {
             return true;
         }
 
-        openBackpackScreen(player, backpackTE);
+        if (!world.isClientSide) {
+            ((com.sajmonoriginal.betterwithbags.gui.BagScreens) player).betterWithBags$displayBackpackBlockScreen(backpackTE);
+        }
         return true;
-    }
-
-    @net.fabricmc.api.Environment(net.fabricmc.api.EnvType.CLIENT)
-    private void openBackpackScreen(Player player, TileEntityBackpack backpackTE) {
-        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getMinecraft();
-        mc.displayScreen(new com.sajmonoriginal.betterwithbags.gui.ScreenBackpackBlock(player.inventory, backpackTE));
     }
 
     private void pickUpBackpack(World world, int x, int y, int z, Player player, TileEntityBackpack backpackTE) {
         ItemStack backpackItem = createItemFromTileEntity(backpackTE);
         world.setBlockWithNotify(x, y, z, 0);
         player.inventory.insertItem(backpackItem, false);
+        if (backpackItem.stackSize > 0) {
+            player.dropPlayerItem(backpackItem);
+        }
+        world.playSoundAtEntity(null, player, "random.pop", 0.2f,
+            ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7f + 1.0f) * 2.0f);
     }
 
     private ItemStack createItemFromTileEntity(TileEntityBackpack backpackTE) {
@@ -94,6 +102,10 @@ public class BlockLogicBackpack extends BlockLogic {
         }
         ItemBackpack.setBackpackContents(stack, contents);
 
+        if (backpackTE.hasAttachment()) {
+            ItemBackpack.setAttachment(stack, backpackTE.getAttachment());
+        }
+
         return stack;
     }
 
@@ -102,6 +114,6 @@ public class BlockLogicBackpack extends BlockLogic {
         if (tileEntity instanceof TileEntityBackpack) {
             return new ItemStack[]{createItemFromTileEntity((TileEntityBackpack) tileEntity)};
         }
-        return new ItemStack[]{new ItemStack(BackpackItems.BACKPACK_SMALL)};
+        return new ItemStack[]{new ItemStack(BackpackItems.getItemForTier(this.tier))};
     }
 }

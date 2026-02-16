@@ -6,6 +6,8 @@ import com.sajmonoriginal.betterwithbags.item.BackpackTier;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.ItemStack;
+import net.minecraft.core.net.packet.Packet;
+import net.minecraft.core.net.packet.PacketTileEntityData;
 import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.world.World;
 
@@ -13,10 +15,12 @@ public class TileEntityBackpack extends TileEntity implements Container {
 
     private ItemStack[] contents;
     private BackpackTier tier;
+    private ItemStack attachment;
 
     public TileEntityBackpack() {
         this.tier = BackpackTier.SMALL;
         this.contents = new ItemStack[tier.getSlots()];
+        this.attachment = null;
     }
 
     public BackpackTier getTier() {
@@ -30,6 +34,19 @@ public class TileEntityBackpack extends TileEntity implements Container {
         if (oldContents != null) {
             System.arraycopy(oldContents, 0, this.contents, 0, Math.min(oldContents.length, this.contents.length));
         }
+    }
+
+    public ItemStack getAttachment() {
+        return attachment;
+    }
+
+    public void setAttachment(ItemStack attachment) {
+        this.attachment = attachment;
+        setChanged();
+    }
+
+    public boolean hasAttachment() {
+        return attachment != null;
     }
 
     @Override
@@ -82,6 +99,9 @@ public class TileEntityBackpack extends TileEntity implements Container {
 
     @Override
     public boolean stillValid(Player player) {
+        if (worldObj == null) {
+            return true;
+        }
         if (worldObj.getTileEntity(x, y, z) != this) {
             return false;
         }
@@ -117,6 +137,11 @@ public class TileEntityBackpack extends TileEntity implements Container {
                 }
             }
         }
+
+        this.attachment = null;
+        if (tag.containsKey("Attachment")) {
+            this.attachment = ItemStack.readItemStackFromNbt(tag.getCompound("Attachment"));
+        }
     }
 
     @Override
@@ -135,12 +160,23 @@ public class TileEntityBackpack extends TileEntity implements Container {
             }
         }
         tag.put("BackpackInventory", itemList);
+
+        if (attachment != null) {
+            CompoundTag attachmentTag = new CompoundTag();
+            attachment.writeToNBT(attachmentTag);
+            tag.put("Attachment", attachmentTag);
+        }
     }
 
     @Override
     public void dropContents(World world, int x, int y, int z) {
         // Contents are preserved in the dropped item, not scattered
         // So we intentionally do nothing here
+    }
+
+    @Override
+    public Packet getDescriptionPacket() {
+        return new PacketTileEntityData(this);
     }
 
     @Override

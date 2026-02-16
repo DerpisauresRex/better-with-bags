@@ -32,10 +32,15 @@ public class BetterWithBagsMod implements ModInitializer, GameStartEntrypoint {
         LOGGER.info("Better With Bags initialized!");
     }
 
+    public static final int BACKPACK_SCREEN_ID = 20;
+    public static final int BACKPACK_BLOCK_SCREEN_ID = 21;
+
     @Override
     public void beforeGameStart() {
+        LOGGER.info("beforeGameStart() called - registering items and blocks");
         new BackpackItems().initializeItems();
         new BackpackBlocks().initializeBlocks();
+        LOGGER.info("Registered items starting at ID {} and blocks starting at ID {}", itemIdStart, blockIdStart);
     }
 
     @Override

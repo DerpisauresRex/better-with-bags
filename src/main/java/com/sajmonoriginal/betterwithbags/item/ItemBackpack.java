@@ -39,7 +39,9 @@ public class ItemBackpack extends Item implements IArmorItem {
     @Override
     public ItemStack onUseItem(ItemStack itemStack, World world, Player player) {
         if (!player.isSneaking()) {
-            openBackpackScreen(player, itemStack);
+            if (!world.isClientSide) {
+                ((com.sajmonoriginal.betterwithbags.gui.BagScreens) player).betterWithBags$displayBackpackScreen(itemStack);
+            }
         }
         return itemStack;
     }
@@ -47,7 +49,9 @@ public class ItemBackpack extends Item implements IArmorItem {
     @Override
     public boolean onUseItemOnBlock(ItemStack itemstack, Player player, World world, int x, int y, int z, Side side, double xOffset, double yOffset) {
         if (!player.isSneaking()) {
-            openBackpackScreen(player, itemstack);
+            if (!world.isClientSide) {
+                ((com.sajmonoriginal.betterwithbags.gui.BagScreens) player).betterWithBags$displayBackpackScreen(itemstack);
+            }
             return true;
         }
 
@@ -63,7 +67,7 @@ public class ItemBackpack extends Item implements IArmorItem {
             return true;
         }
 
-        int blockId = BackpackBlocks.BACKPACK_BLOCK.id();
+        int blockId = BackpackBlocks.getBlockForTier(this.tier).id();
         Direction facing = player.getHorizontalPlacementDirection(side).getOpposite();
         world.setBlockAndMetadataWithNotify(placeX, placeY, placeZ, blockId, facing.getId());
 
@@ -78,16 +82,15 @@ public class ItemBackpack extends Item implements IArmorItem {
                     backpackTE.setItem(i, contents[i]);
                 }
             }
+
+            ItemStack attachment = getAttachment(itemstack);
+            if (attachment != null) {
+                backpackTE.setAttachment(attachment);
+            }
         }
 
         itemstack.stackSize--;
         return true;
-    }
-
-    @net.fabricmc.api.Environment(net.fabricmc.api.EnvType.CLIENT)
-    private void openBackpackScreen(Player player, ItemStack backpackStack) {
-        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getMinecraft();
-        mc.displayScreen(new com.sajmonoriginal.betterwithbags.gui.ScreenBackpack(player.inventory, backpackStack));
     }
 
     @Override
@@ -201,5 +204,34 @@ public class ItemBackpack extends Item implements IArmorItem {
             return tag.getList("BackpackInventory").tagCount();
         }
         return 0;
+    }
+
+    public static ItemStack getAttachment(ItemStack backpackStack) {
+        if (backpackStack == null || !(backpackStack.getItem() instanceof ItemBackpack)) {
+            return null;
+        }
+        CompoundTag tag = backpackStack.getData();
+        if (tag.containsKey("Attachment")) {
+            return ItemStack.readItemStackFromNbt(tag.getCompound("Attachment"));
+        }
+        return null;
+    }
+
+    public static void setAttachment(ItemStack backpackStack, ItemStack attachment) {
+        if (backpackStack == null || !(backpackStack.getItem() instanceof ItemBackpack)) {
+            return;
+        }
+        CompoundTag tag = backpackStack.getData();
+        if (attachment != null) {
+            CompoundTag attachmentTag = new CompoundTag();
+            attachment.writeToNBT(attachmentTag);
+            tag.put("Attachment", attachmentTag);
+        } else {
+            tag.getValue().remove("Attachment");
+        }
+    }
+
+    public static boolean hasAttachment(ItemStack backpackStack) {
+        return getAttachment(backpackStack) != null;
     }
 }

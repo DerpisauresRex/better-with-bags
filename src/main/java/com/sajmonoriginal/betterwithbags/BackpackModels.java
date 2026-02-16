@@ -2,15 +2,22 @@ package com.sajmonoriginal.betterwithbags;
 
 import com.sajmonoriginal.betterwithbags.block.BackpackBlocks;
 import com.sajmonoriginal.betterwithbags.block.TileEntityBackpack;
+import com.sajmonoriginal.betterwithbags.block.TileEntityBedroll;
 import com.sajmonoriginal.betterwithbags.item.BackpackItems;
+import com.sajmonoriginal.betterwithbags.item.BackpackTier;
 import com.sajmonoriginal.betterwithbags.model.ItemModelBackpack;
+import com.sajmonoriginal.betterwithbags.model.ItemModelPlacedBackpack;
+import com.sajmonoriginal.betterwithbags.model.ItemModelPlacedBedroll;
 import com.sajmonoriginal.betterwithbags.render.TileEntityRendererBackpack;
+import com.sajmonoriginal.betterwithbags.render.TileEntityRendererBedroll;
 import net.minecraft.client.render.EntityRenderDispatcher;
 import net.minecraft.client.render.TileEntityRenderDispatcher;
 import net.minecraft.client.render.block.color.BlockColorDispatcher;
 import net.minecraft.client.render.block.model.BlockModelDispatcher;
 import net.minecraft.client.render.block.model.BlockModelEmpty;
 import net.minecraft.client.render.item.model.ItemModelDispatcher;
+import net.minecraft.client.render.item.model.ItemModelStandard;
+import net.minecraft.core.block.Block;
 import turniplabs.halplibe.helper.ModelHelper;
 import turniplabs.halplibe.util.ModelEntrypoint;
 
@@ -20,7 +27,12 @@ public class BackpackModels implements ModelEntrypoint {
 
     @Override
     public void initBlockModels(BlockModelDispatcher dispatcher) {
-        dispatcher.addDispatch(BackpackBlocks.BACKPACK_BLOCK, new BlockModelEmpty<>(BackpackBlocks.BACKPACK_BLOCK));
+        dispatcher.addDispatch(BackpackBlocks.BACKPACK_BLOCK_SMALL, new BlockModelEmpty<>(BackpackBlocks.BACKPACK_BLOCK_SMALL));
+        dispatcher.addDispatch(BackpackBlocks.BACKPACK_BLOCK_MEDIUM, new BlockModelEmpty<>(BackpackBlocks.BACKPACK_BLOCK_MEDIUM));
+        dispatcher.addDispatch(BackpackBlocks.BACKPACK_BLOCK_LARGE, new BlockModelEmpty<>(BackpackBlocks.BACKPACK_BLOCK_LARGE));
+        dispatcher.addDispatch(BackpackBlocks.BACKPACK_BLOCK_REINFORCED, new BlockModelEmpty<>(BackpackBlocks.BACKPACK_BLOCK_REINFORCED));
+        dispatcher.addDispatch(BackpackBlocks.BACKPACK_BLOCK_NETHER, new BlockModelEmpty<>(BackpackBlocks.BACKPACK_BLOCK_NETHER));
+        dispatcher.addDispatch(BackpackBlocks.BEDROLL_BLOCK, new BlockModelEmpty<>(BackpackBlocks.BEDROLL_BLOCK));
     }
 
     @Override
@@ -35,6 +47,16 @@ public class BackpackModels implements ModelEntrypoint {
             .setIcon(MOD_ID + ":item/backpack_reinforced"));
         dispatcher.addDispatch(new ItemModelBackpack(BackpackItems.BACKPACK_NETHER, null)
             .setIcon(MOD_ID + ":item/backpack_nether"));
+
+        dispatcher.addDispatch(new ItemModelStandard(BackpackItems.BEDROLL, null)
+            .setIcon(MOD_ID + ":item/bedroll"));
+
+        for (BackpackTier tier : BackpackTier.values()) {
+            Block<?> block = BackpackBlocks.getBlockForTier(tier);
+            dispatcher.addDispatch(new ItemModelPlacedBackpack(block.asItem(), tier));
+        }
+
+        dispatcher.addDispatch(new ItemModelPlacedBedroll(BackpackBlocks.BEDROLL_BLOCK.asItem()));
     }
 
     @Override
@@ -44,6 +66,7 @@ public class BackpackModels implements ModelEntrypoint {
     @Override
     public void initTileEntityModels(TileEntityRenderDispatcher dispatcher) {
         ModelHelper.setTileEntityModel(TileEntityBackpack.class, TileEntityRendererBackpack::new);
+        ModelHelper.setTileEntityModel(TileEntityBedroll.class, TileEntityRendererBedroll::new);
     }
 
     @Override
