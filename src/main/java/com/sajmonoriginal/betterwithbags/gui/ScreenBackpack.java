@@ -21,8 +21,10 @@ public class ScreenBackpack extends ScreenContainerAbstract {
         super(new ContainerBackpack(playerInventory, backpackStack));
         this.container = (ContainerBackpack) this.inventorySlots;
         this.rows = container.getRows();
-        this.ySize = 113 + rows * 18;
         BackpackTier tier = container.getTier();
+        boolean hasAttachmentSlot = tier == BackpackTier.LARGE || tier == BackpackTier.REINFORCED || tier == BackpackTier.NETHER;
+        this.xSize = hasAttachmentSlot ? 194 : 176;
+        this.ySize = 121 + rows * 18;
         this.guiTexture = GUI_TEXTURE_BASE + tier.getName() + ".png";
     }
 
@@ -35,8 +37,13 @@ public class ScreenBackpack extends ScreenContainerAbstract {
         int guiLeft = (this.width - this.xSize) / 2;
         int guiTop = (this.height - this.ySize) / 2;
 
-        this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, this.xSize, rows * 18 + 17);
-        this.drawTexturedModalRect(guiLeft, guiTop + rows * 18 + 17, 0, 126, this.xSize, 96);
+        this.drawTexturedModalRect(guiLeft, guiTop + rows * 18 + 17, 0, 118, 176, 103);
+        this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, 176, rows * 18 + 17 + 7);
+
+        BackpackTier tier = container.getTier();
+        if (tier == BackpackTier.LARGE || tier == BackpackTier.REINFORCED || tier == BackpackTier.NETHER) {
+            this.drawTexturedModalRect(guiLeft + 174, guiTop + 13, 174, 13, 25, 26);
+        }
     }
 
     @Override
@@ -44,5 +51,13 @@ public class ScreenBackpack extends ScreenContainerAbstract {
         String tierName = container.getTier().name().substring(0, 1) + container.getTier().name().substring(1).toLowerCase();
         this.font.drawString(tierName + " Backpack", 8, 6, 0xFFFFFF);
         this.font.drawString("Inventory", 8, this.ySize - 96 + 2, 0x404040);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (!this.container.stillValid(this.mc.thePlayer)) {
+            this.mc.thePlayer.closeScreen();
+        }
     }
 }

@@ -5,36 +5,49 @@ import com.sajmonoriginal.betterwithbags.item.ItemBackpack;
 import net.minecraft.core.InventoryAction;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.ItemStack;
+import net.minecraft.core.net.packet.PacketContainerSetSlot;
 import net.minecraft.core.player.inventory.container.ContainerInventory;
 import net.minecraft.core.player.inventory.menu.MenuAbstract;
 import net.minecraft.core.player.inventory.slot.Slot;
+import net.minecraft.server.entity.player.PlayerServer;
 
 import java.util.Collections;
 import java.util.List;
 
 public class ContainerBackpack extends MenuAbstract {
-    private final ItemStack backpackStack;
     private final BackpackTier tier;
     private final int rows;
     private final int capacity;
+    private final BackpackInventoryContainer backpackContainer;
+    private final ContainerInventory playerInventory;
+    private final int heldSlotIndex;
 
     public ContainerBackpack(ContainerInventory playerInventory, ItemStack backpackStack) {
-        this.backpackStack = backpackStack;
+        this.playerInventory = playerInventory;
+        this.heldSlotIndex = playerInventory.getCurrentItemIndex();
         ItemBackpack backpack = (ItemBackpack) backpackStack.getItem();
         this.tier = backpack.getTier();
         this.rows = tier.getRows();
         this.capacity = tier.getSlots();
+        this.backpackContainer = new BackpackInventoryContainer(playerInventory, heldSlotIndex);
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < 9; col++) {
                 int slotIndex = row * 9 + col;
                 if (slotIndex < capacity) {
-                    this.addSlot(new SlotBackpackItem(backpackStack, slotIndex, 8 + col * 18, 18 + row * 18));
+                    this.addSlot(new SlotBackpackItem(backpackContainer, slotIndex, 8 + col * 18, 18 + row * 18));
                 }
             }
         }
 
-        int playerInvY = 17 + rows * 18 + 14;
+        boolean supportsAttachment = tier == BackpackTier.LARGE || 
+                                      tier == BackpackTier.REINFORCED || 
+                                      tier == BackpackTier.NETHER;
+        if (supportsAttachment) {
+            this.addSlot(new SlotAttachment(playerInventory, heldSlotIndex, 178, 18));
+        }
+
+        int playerInvY = 17 + rows * 18 + 22;
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 this.addSlot(new Slot(playerInventory, col + row * 9 + 9, 8 + col * 18, playerInvY + row * 18));
@@ -57,9 +70,13 @@ public class ContainerBackpack extends MenuAbstract {
 
     @Override
     public List<Integer> getMoveSlots(InventoryAction action, Slot slot, int target, Player player) {
-        int playerStart = capacity;
+        int attachmentSlot = capacity;
+        int playerStart = capacity + 1;
         if (slot.index < capacity) {
             return this.getSlots(slot.index, 1, false);
+        }
+        if (slot.index == attachmentSlot) {
+            return this.getSlots(attachmentSlot, 1, false);
         }
         if (action == InventoryAction.MOVE_ALL) {
             if (slot.index >= playerStart && slot.index < playerStart + 27) {
@@ -74,8 +91,12 @@ public class ContainerBackpack extends MenuAbstract {
 
     @Override
     public List<Integer> getTargetSlots(InventoryAction action, Slot slot, int target, Player player) {
-        int playerStart = capacity;
+        int attachmentSlot = capacity;
+        int playerStart = capacity + 1;
         if (slot.index < capacity) {
+            return this.getSlots(playerStart, 36, false);
+        }
+        if (slot.index == attachmentSlot) {
             return this.getSlots(playerStart, 36, false);
         }
         if (slot.index >= playerStart) {
@@ -83,13 +104,49 @@ public class ContainerBackpack extends MenuAbstract {
             if (stack != null && stack.getItem() instanceof ItemBackpack) {
                 return Collections.emptyList();
             }
+            if (stack != null && stack.getItem() instanceof com.sajmonoriginal.betterwithbags.item.ItemBedroll) {
+                Slot attSlot = this.getSlot(attachmentSlot);
+                if (attSlot != null && attSlot.mayPlace(stack) && !attSlot.hasItem()) {
+                    return this.getSlots(attachmentSlot, 1, false);
+                }
+            }
             return this.getSlots(0, capacity, false);
         }
         return Collections.emptyList();
     }
 
     @Override
+    public void broadcastChanges() {
+        if (!isBackpackInSlot()) {
+            return;
+        }
+        backpackContainer.flush();
+        super.broadcastChanges();
+    }
+
+    @Override
+    public void onCraftGuiClosed(Player player) {
+        super.onCraftGuiClosed(player);
+        backpackContainer.flush();
+        if (player.world != null && !player.world.isClientSide) {
+            syncHeldItemToClient(player);
+        }
+    }
+
+    private void syncHeldItemToClient(Player player) {
+        PlayerServer serverPlayer = (PlayerServer) player;
+        serverPlayer.playerNetServerHandler.sendPacket(
+            new PacketContainerSetSlot(0, heldSlotIndex + 36, player.inventory.mainInventory[heldSlotIndex])
+        );
+    }
+
+    @Override
     public boolean stillValid(Player player) {
-        return true;
+        return isBackpackInSlot();
+    }
+
+    private boolean isBackpackInSlot() {
+        ItemStack current = playerInventory.mainInventory[heldSlotIndex];
+        return current != null && current.getItem() instanceof ItemBackpack;
     }
 }
