@@ -22,18 +22,33 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.useless.dragonfly.data.entity.mojang.EntityGeometryMojangData;
 import org.useless.dragonfly.models.entity.StaticEntityModel;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.InputStream;
+
 @Environment(EnvType.CLIENT)
 @Mixin(value = MobRendererPlayer.class, remap = false)
 public abstract class MobRendererPlayerMixin extends MobRenderer<Player> {
 
     private static final String TEXTURE_PATH = "/assets/betterwithbags/textures/entity/";
     private static final String GEOMETRY_ID = "geometry.humanoid.armor.bag";
+    private static final String BEDROLL_GEOMETRY_ID = "geometry.bag.bedroll";
+    private static final String BEDROLL_TEXTURE = TEXTURE_PATH + "bedroll_attachment.png";
 
     @Shadow
     private ModelBiped modelBipedMain;
 
     @Unique
     private static StaticEntityModel bwb$model;
+
+    @Unique
+    private static StaticEntityModel bwb$modelBedroll;
+
+    @Unique
+    private static boolean bwb$bedrollTextureChecked = false;
+
+    @Unique
+    private static boolean bwb$bedrollTextureValid = false;
 
     protected MobRendererPlayerMixin(ModelBase model, float shadowSize) {
         super(model, shadowSize);
@@ -45,6 +60,14 @@ public abstract class MobRendererPlayerMixin extends MobRenderer<Player> {
             bwb$model = EntityGeometryMojangData.Cache.getModel(GEOMETRY_ID, 0);
         }
         return bwb$model;
+    }
+
+    @Unique
+    private StaticEntityModel bwb$getBedrollModel() {
+        if (bwb$modelBedroll == null) {
+            bwb$modelBedroll = EntityGeometryMojangData.Cache.getModel(BEDROLL_GEOMETRY_ID, 0);
+        }
+        return bwb$modelBedroll;
     }
 
     @Unique
@@ -61,11 +84,9 @@ public abstract class MobRendererPlayerMixin extends MobRenderer<Player> {
 
         ItemBackpack backpackItem = (ItemBackpack) chestSlot.getItem();
         BackpackTier tier = backpackItem.getTier();
-        StaticEntityModel model = bwb$getModel();
+        boolean hasBedroll = ItemBackpack.hasAttachment(chestSlot);
 
         GL11.glPushMatrix();
-
-        this.renderDispatcher.textureManager.loadTexture(bwb$getTexture(tier)).bind();
 
         float bodyYaw = modelBipedMain.body.yRot;
         float bodyPitch = modelBipedMain.body.xRot;
@@ -83,7 +104,34 @@ public abstract class MobRendererPlayerMixin extends MobRenderer<Player> {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
-        model.render(Tessellator.instance);
+        this.renderDispatcher.textureManager.loadTexture(bwb$getTexture(tier)).bind();
+        bwb$getModel().render(Tessellator.instance);
+
+        if (hasBedroll) {
+            if (!bwb$bedrollTextureChecked) {
+                bwb$bedrollTextureChecked = true;
+                try {
+                    InputStream stream = MobRendererPlayerMixin.class.getResourceAsStream(BEDROLL_TEXTURE);
+                    if (stream != null) {
+                        BufferedImage testImg = ImageIO.read(stream);
+                        bwb$bedrollTextureValid = (testImg != null);
+                        stream.close();
+                    }
+                } catch (Exception e) {
+                    bwb$bedrollTextureValid = false;
+                }
+            }
+            if (bwb$bedrollTextureValid) {
+                try {
+                    StaticEntityModel bedroll = bwb$getBedrollModel();
+                    if (bedroll != null) {
+                        this.renderDispatcher.textureManager.loadTexture(BEDROLL_TEXTURE).bind();
+                        bedroll.render(Tessellator.instance);
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+        }
 
         GL11.glEnable(GL11.GL_CULL_FACE);
         GL11.glDisable(GL11.GL_BLEND);

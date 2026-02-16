@@ -1,7 +1,6 @@
 package com.sajmonoriginal.betterwithbags.mixin.client;
 
 import com.sajmonoriginal.betterwithbags.BetterWithBagsMod;
-import com.sajmonoriginal.betterwithbags.gui.ContainerBackpack;
 import com.sajmonoriginal.betterwithbags.item.BackpackTier;
 import com.sajmonoriginal.betterwithbags.item.ItemBackpack;
 import com.sajmonoriginal.betterwithbags.util.BackpackMenuCapable;
@@ -31,19 +30,12 @@ public abstract class ScreenInventoryMixin extends ScreenContainerAbstract {
     @Unique
     private static final int EXTENSION_WIDTH = 176;
     @Unique
+    private static final int EXTENSION_OVERLAP = 3;
+    @Unique
     private static final int EXTENSION_TITLE_HEIGHT = 14;
     @Unique
     private static final int EXTENSION_BOTTOM_HEIGHT = 7;
-    @Unique
-    private static final int INV_BOTTOM_BORDER_START = 162;
-    @Unique
-    private static final int INV_BORDER_COLOR = 0xFF000000;
-    @Unique
-    private static final int INV_BODY_COLOR = 0xFFC6C6C6;
-    @Unique
-    private static final int INV_HIGHLIGHT_COLOR = 0xFFFFFFFF;
-    @Unique
-    private static final int INV_SHADOW_COLOR = 0xFF555555;
+
 
     @Unique
     private int bwb$backpackRows = 0;
@@ -104,7 +96,7 @@ public abstract class ScreenInventoryMixin extends ScreenContainerAbstract {
         }
     }
 
-    @Inject(method = "drawGuiContainerBackgroundLayer", at = @At("TAIL"))
+    @Inject(method = "drawGuiContainerBackgroundLayer", at = @At("HEAD"))
     private void bwb$drawBackpackPanel(float partialTicks, CallbackInfo ci) {
         if (this.bwb$backpackRows <= 0 || this.bwb$currentTier == null) {
             return;
@@ -113,32 +105,25 @@ public abstract class ScreenInventoryMixin extends ScreenContainerAbstract {
         int guiLeft = (this.width - this.xSize) / 2;
         int guiTop = (this.height - this.ySize) / 2;
 
-        int flatY = guiTop + INV_BOTTOM_BORDER_START;
-        int flatEnd = guiTop + STANDARD_HEIGHT;
-        this.drawRect(guiLeft, flatY, guiLeft + EXTENSION_WIDTH, flatEnd, INV_BODY_COLOR);
-        this.drawRect(guiLeft, flatY, guiLeft + 1, flatEnd, INV_BORDER_COLOR);
-        this.drawRect(guiLeft + 1, flatY, guiLeft + 3, flatEnd - 2, INV_HIGHLIGHT_COLOR);
-        this.drawRect(guiLeft + 173, flatY, guiLeft + 175, flatEnd - 2, INV_SHADOW_COLOR);
-        this.drawRect(guiLeft + 175, flatY, guiLeft + EXTENSION_WIDTH, flatEnd, INV_BORDER_COLOR);
-
-        int panelY = guiTop + STANDARD_HEIGHT;
+        int panelY = guiTop + STANDARD_HEIGHT - EXTENSION_OVERLAP;
 
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         String extTexture = EXTENSION_TEXTURE_BASE + this.bwb$currentTier.getName() + ".png";
         this.mc.textureManager.loadTexture(extTexture).bind();
 
-        int panelHeight = EXTENSION_TITLE_HEIGHT + this.bwb$backpackRows * ROW_HEIGHT + EXTENSION_BOTTOM_HEIGHT;
+        int panelHeight = EXTENSION_OVERLAP + EXTENSION_TITLE_HEIGHT + this.bwb$backpackRows * ROW_HEIGHT + EXTENSION_BOTTOM_HEIGHT;
         this.drawTexturedModalRect(guiLeft, panelY, 0, 0, EXTENSION_WIDTH, panelHeight);
-    }
 
-    @Inject(method = "drawGuiContainerForegroundLayer", at = @At("TAIL"))
-    private void bwb$drawBackpackLabel(CallbackInfo ci) {
-        if (this.bwb$backpackRows <= 0 || this.bwb$currentTier == null) {
-            return;
+        if (this.bwb$currentTier == BackpackTier.LARGE ||
+            this.bwb$currentTier == BackpackTier.REINFORCED ||
+            this.bwb$currentTier == BackpackTier.NETHER) {
+            this.drawTexturedModalRect(guiLeft + 174, panelY + 13, 174, 13, 36, 26);
         }
 
-        String tierName = this.bwb$currentTier.name().substring(0, 1) + this.bwb$currentTier.name().substring(1).toLowerCase();
-        this.font.drawString(tierName + " Backpack", 8, STANDARD_HEIGHT + 4, 0xFFFFFF);
+        String tierName = this.bwb$currentTier.getName();
+        tierName = tierName.substring(0, 1).toUpperCase() + tierName.substring(1);
+        this.font.drawString(tierName + " Backpack", guiLeft + 8, panelY + EXTENSION_OVERLAP + 4, 0xFFFFFF);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
     }
 }

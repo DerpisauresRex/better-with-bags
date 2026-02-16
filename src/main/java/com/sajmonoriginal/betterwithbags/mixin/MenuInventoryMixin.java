@@ -1,16 +1,17 @@
 package com.sajmonoriginal.betterwithbags.mixin;
 
-import com.sajmonoriginal.betterwithbags.BetterWithBagsMod;
-import com.sajmonoriginal.betterwithbags.gui.ContainerBackpack;
+import com.sajmonoriginal.betterwithbags.gui.WornBackpackContainer;
 import com.sajmonoriginal.betterwithbags.item.BackpackTier;
 import com.sajmonoriginal.betterwithbags.item.ItemBackpack;
 import com.sajmonoriginal.betterwithbags.mixin.accessor.MenuAbstractAccessor;
 import com.sajmonoriginal.betterwithbags.slot.SlotBackpack;
+import com.sajmonoriginal.betterwithbags.slot.SlotBackpackAttachment;
 import com.sajmonoriginal.betterwithbags.util.BackpackMenuCapable;
 import net.minecraft.core.InventoryAction;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.IArmorItem;
 import net.minecraft.core.item.ItemStack;
+import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.player.inventory.container.ContainerInventory;
 import net.minecraft.core.player.inventory.menu.MenuInventory;
 import net.minecraft.core.player.inventory.slot.Slot;
@@ -19,6 +20,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
@@ -33,6 +35,8 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
     private static final int STANDARD_HEIGHT = 166;
     @Unique
     private static final int ROW_HEIGHT = 18;
+    @Unique
+    private static final int EXTENSION_TITLE_HEIGHT = 14;
     @Unique
     private static final int HIDDEN_Y = -9999;
 
@@ -49,7 +53,10 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
     private List<SlotBackpack> bwb$backpackSlots = new ArrayList<>();
 
     @Unique
-    private boolean bwb$slotsCreated = false;
+    private SlotBackpackAttachment bwb$attachmentSlot = null;
+
+    @Unique
+    private WornBackpackContainer bwb$backpackContainer = null;
 
     @Override
     public boolean betterWithBags$hasBackpackSlots() {
@@ -64,6 +71,26 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
     @Override
     public int betterWithBags$getBackpackRows() {
         return this.bwb$backpackRows;
+    }
+
+    @Inject(method = "<init>(Lnet/minecraft/core/player/inventory/container/ContainerInventory;Z)V",
+            at = @At(value = "INVOKE",
+                     target = "Lnet/minecraft/core/player/inventory/menu/MenuInventory;slotsChanged(Lnet/minecraft/core/player/inventory/container/Container;)V"))
+    private void bwb$addBackpackSlotsInConstructor(ContainerInventory inventory, boolean active, CallbackInfo ci) {
+        MenuInventory self = (MenuInventory) (Object) this;
+        this.bwb$backpackSlotStartIndex = self.slots.size();
+
+        bwb$backpackContainer = new WornBackpackContainer(inventory);
+
+        int maxCapacity = BackpackTier.REINFORCED.getSlots();
+        for (int i = 0; i < maxCapacity; i++) {
+            SlotBackpack slot = new SlotBackpack(bwb$backpackContainer, inventory, i, HIDDEN_Y, HIDDEN_Y);
+            bwb$backpackSlots.add(slot);
+            ((MenuAbstractAccessor) this).invokeAddSlot(slot);
+        }
+
+        bwb$attachmentSlot = new SlotBackpackAttachment(inventory, HIDDEN_Y, HIDDEN_Y);
+        ((MenuAbstractAccessor) this).invokeAddSlot(bwb$attachmentSlot);
     }
 
     @Override
@@ -86,10 +113,6 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
         int capacity = tier.getSlots();
         int rows = tier.getRows();
 
-        if (!bwb$slotsCreated) {
-            createBackpackSlots();
-        }
-
         this.bwb$hasBackpackSlots = true;
         this.bwb$backpackRows = rows;
 
@@ -99,27 +122,29 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
                 int row = i / 9;
                 int col = i % 9;
                 slot.x = 8 + col * 18;
-                slot.y = STANDARD_HEIGHT + 15 + row * ROW_HEIGHT;
+                slot.y = STANDARD_HEIGHT + EXTENSION_TITLE_HEIGHT + 1 + row * ROW_HEIGHT;
             } else {
                 slot.x = HIDDEN_Y;
                 slot.y = HIDDEN_Y;
             }
         }
+
+        if (bwb$attachmentSlot != null && bwb$attachmentSlot.isActive()) {
+            bwb$attachmentSlot.x = 178;
+            bwb$attachmentSlot.y = STANDARD_HEIGHT + EXTENSION_TITLE_HEIGHT + 1;
+        } else if (bwb$attachmentSlot != null) {
+            bwb$attachmentSlot.x = HIDDEN_Y;
+            bwb$attachmentSlot.y = HIDDEN_Y;
+        }
     }
 
-    @Unique
-    private void createBackpackSlots() {
-        MenuInventory self = (MenuInventory) (Object) this;
-        this.bwb$backpackSlotStartIndex = self.slots.size();
-
-        int maxCapacity = BackpackTier.REINFORCED.getSlots();
-        for (int i = 0; i < maxCapacity; i++) {
-            SlotBackpack slot = new SlotBackpack(inventory, i, HIDDEN_Y, HIDDEN_Y);
-            bwb$backpackSlots.add(slot);
-            ((MenuAbstractAccessor) this).invokeAddSlot(slot);
+    @Inject(method = "slotsChanged", at = @At("HEAD"))
+    private void bwb$flushBackpackContainer(Container container, CallbackInfo ci) {
+        if (bwb$backpackContainer != null) {
+            bwb$backpackContainer.flush();
         }
 
-        bwb$slotsCreated = true;
+        betterWithBags$refreshBackpackSlots();
     }
 
     @Unique
@@ -130,6 +155,11 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
         for (SlotBackpack slot : bwb$backpackSlots) {
             slot.x = HIDDEN_Y;
             slot.y = HIDDEN_Y;
+        }
+
+        if (bwb$attachmentSlot != null) {
+            bwb$attachmentSlot.x = HIDDEN_Y;
+            bwb$attachmentSlot.y = HIDDEN_Y;
         }
     }
 

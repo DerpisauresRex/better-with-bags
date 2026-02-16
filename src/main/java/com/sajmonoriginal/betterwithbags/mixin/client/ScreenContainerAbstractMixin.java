@@ -1,6 +1,7 @@
 package com.sajmonoriginal.betterwithbags.mixin.client;
 
 import com.sajmonoriginal.betterwithbags.slot.SlotBackpack;
+import com.sajmonoriginal.betterwithbags.slot.SlotBackpackAttachment;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.container.ScreenContainerAbstract;
@@ -22,7 +23,7 @@ public abstract class ScreenContainerAbstractMixin {
     private void bwb$allowBackpackSlotClicks(int mouseX, int mouseY, CallbackInfoReturnable<Integer> cir) {
         if (cir.getReturnValue() == -999) {
             Slot slot = getSlotAtPosition(mouseX, mouseY);
-            if (slot instanceof SlotBackpack) {
+            if (slot instanceof SlotBackpack || slot instanceof SlotBackpackAttachment) {
                 cir.setReturnValue(slot.index);
             }
         }
