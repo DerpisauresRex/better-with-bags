@@ -2,6 +2,7 @@ package com.sajmonoriginal.betterwithbags.item;
 
 import com.sajmonoriginal.betterwithbags.BetterWithBagsMod;
 import net.minecraft.core.item.Item;
+import net.minecraft.core.item.tag.ItemTags;
 import turniplabs.halplibe.helper.ItemBuilder;
 import turniplabs.halplibe.helper.creativeInventory.CreativeInventoryCategory;
 import turniplabs.halplibe.helper.creativeInventory.CreativeInventoryPlacement;
@@ -48,7 +49,8 @@ public class BackpackItems {
             .build(new ItemBackpack("backpack.reinforced", itemKey("backpack_reinforced"), currentId++, BackpackTier.REINFORCED));
 
         BACKPACK_NETHER = backpackBuilder()
-            .build(new ItemBackpack("backpack.nether", itemKey("backpack_nether"), currentId++, BackpackTier.NETHER));
+            .build(new ItemBackpack("backpack.nether", itemKey("backpack_nether"), currentId++, BackpackTier.NETHER))
+            .withTags(ItemTags.IS_FIRE_PROOF);
 
         BEDROLL = backpackBuilder()
             .build(new ItemBedroll("bedroll", itemKey("bedroll"), currentId++));
