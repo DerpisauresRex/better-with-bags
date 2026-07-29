@@ -10,15 +10,13 @@ import com.sajmonoriginal.betterwithbags.model.ItemModelPlacedBackpack;
 import com.sajmonoriginal.betterwithbags.model.ItemModelPlacedBedroll;
 import com.sajmonoriginal.betterwithbags.render.TileEntityRendererBackpack;
 import com.sajmonoriginal.betterwithbags.render.TileEntityRendererBedroll;
-import net.minecraft.client.render.EntityRenderDispatcher;
+import net.minecraft.client.render.EntityRendererDispatcher;
 import net.minecraft.client.render.TileEntityRenderDispatcher;
 import net.minecraft.client.render.block.color.BlockColorDispatcher;
 import net.minecraft.client.render.block.model.BlockModelDispatcher;
-import net.minecraft.client.render.block.model.BlockModelEmpty;
 import net.minecraft.client.render.item.model.ItemModelDispatcher;
 import net.minecraft.client.render.item.model.ItemModelStandard;
 import net.minecraft.core.block.Block;
-import turniplabs.halplibe.helper.ModelHelper;
 import turniplabs.halplibe.util.ModelEntrypoint;
 
 public class BackpackModels implements ModelEntrypoint {
@@ -27,12 +25,6 @@ public class BackpackModels implements ModelEntrypoint {
 
     @Override
     public void initBlockModels(BlockModelDispatcher dispatcher) {
-        dispatcher.addDispatch(BackpackBlocks.BACKPACK_BLOCK_SMALL, new BlockModelEmpty<>(BackpackBlocks.BACKPACK_BLOCK_SMALL));
-        dispatcher.addDispatch(BackpackBlocks.BACKPACK_BLOCK_MEDIUM, new BlockModelEmpty<>(BackpackBlocks.BACKPACK_BLOCK_MEDIUM));
-        dispatcher.addDispatch(BackpackBlocks.BACKPACK_BLOCK_LARGE, new BlockModelEmpty<>(BackpackBlocks.BACKPACK_BLOCK_LARGE));
-        dispatcher.addDispatch(BackpackBlocks.BACKPACK_BLOCK_REINFORCED, new BlockModelEmpty<>(BackpackBlocks.BACKPACK_BLOCK_REINFORCED));
-        dispatcher.addDispatch(BackpackBlocks.BACKPACK_BLOCK_NETHER, new BlockModelEmpty<>(BackpackBlocks.BACKPACK_BLOCK_NETHER));
-        dispatcher.addDispatch(BackpackBlocks.BEDROLL_BLOCK, new BlockModelEmpty<>(BackpackBlocks.BEDROLL_BLOCK));
     }
 
     @Override
@@ -60,13 +52,13 @@ public class BackpackModels implements ModelEntrypoint {
     }
 
     @Override
-    public void initEntityModels(EntityRenderDispatcher dispatcher) {
+    public void initEntityModels(EntityRendererDispatcher dispatcher) {
     }
 
     @Override
     public void initTileEntityModels(TileEntityRenderDispatcher dispatcher) {
-        ModelHelper.setTileEntityModel(TileEntityBackpack.class, TileEntityRendererBackpack::new);
-        ModelHelper.setTileEntityModel(TileEntityBedroll.class, TileEntityRendererBedroll::new);
+        dispatcher.assignRenderer(TileEntityBackpack.class, new TileEntityRendererBackpack());
+        dispatcher.assignRenderer(TileEntityBedroll.class, new TileEntityRendererBedroll());
     }
 
     @Override

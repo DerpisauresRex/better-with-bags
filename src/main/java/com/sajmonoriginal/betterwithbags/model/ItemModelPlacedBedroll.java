@@ -3,22 +3,23 @@ package com.sajmonoriginal.betterwithbags.model;
 import com.sajmonoriginal.betterwithbags.BetterWithBagsMod;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.Font;
 import net.minecraft.client.render.TextureManager;
 import net.minecraft.client.render.item.model.ItemModelStandard;
-import net.minecraft.client.render.tessellator.Tessellator;
+import net.minecraft.client.render.renderer.BlendFactor;
+import net.minecraft.client.render.renderer.GLRenderer;
+import net.minecraft.client.render.renderer.State;
+import net.minecraft.client.render.tessellator.TessellatorGeneral;
 import net.minecraft.client.render.texture.stitcher.TextureRegistry;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.entity.Entity;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 @Environment(EnvType.CLIENT)
 public class ItemModelPlacedBedroll extends ItemModelStandard {
 
     private static final String TEX_BASE = "/assets/" + BetterWithBagsMod.MOD_ID + "/textures/block/bedroll/";
 
-    // Head and foot textures are SWAPPED (same as TileEntityRendererBedroll)
     private static final String HEAD_TOP = TEX_BASE + "foot_top.png";
     private static final String HEAD_BOTTOM = TEX_BASE + "foot_bottom.png";
     private static final String HEAD_SIDE = TEX_BASE + "foot_side.png";
@@ -39,40 +40,40 @@ public class ItemModelPlacedBedroll extends ItemModelStandard {
     }
 
     @Override
-    public void renderItemIntoGui(Tessellator tessellator, Font font, TextureManager textureManager, ItemStack itemStack, int x, int y, float brightness, float alpha) {
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+    public void renderGui(TessellatorGeneral tessellator, Entity entity, ItemStack itemStack, int x, int y, byte layerFlags, float alpha) {
+        float brightness = 1.0F;
+        TextureManager textureManager = Minecraft.getMinecraft().textureManager;
+        GLRenderer.enableState(State.BLEND);
+        GLRenderer.setBlendFunc(BlendFactor.SRC_ALPHA, BlendFactor.ONE_MINUS_SRC_ALPHA);
 
-        GL11.glPushMatrix();
+        GLRenderer.pushFrame();
 
-        GL11.glTranslatef(x - 2, y + 3, -3.0f);
-        GL11.glScalef(10.0f, 10.0f, 10.0f);
-        GL11.glTranslatef(1.0f, 0.5f, 1.0f);
-        GL11.glScalef(1.0f, 1.0f, -1.0f);
-        GL11.glRotatef(210.0f, 1.0f, 0.0f, 0.0f);
-        GL11.glRotatef(45.0f, 0.0f, 1.0f, 0.0f);
-        GL11.glColor4f(brightness, brightness, brightness, alpha);
-        GL11.glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
+        GLRenderer.modelM4f().translate(x - 2, y + 3, -3.0f);
+        GLRenderer.modelM4f().scale(10.0f, 10.0f, 10.0f);
+        GLRenderer.modelM4f().translate(1.0f, 0.5f, 1.0f);
+        GLRenderer.modelM4f().scale(1.0f, 1.0f, -1.0f);
+        GLRenderer.modelM4f().rotateX((float)Math.toRadians(210.0f));
+        GLRenderer.modelM4f().rotateY((float)Math.toRadians(45.0f));
+        GLRenderer.setColor4f(brightness, brightness, brightness, alpha);
+        GLRenderer.modelM4f().rotateY((float)Math.toRadians(-90.0f));
 
-        GL11.glScalef(0.5f, 0.5f, 0.5f);
-        GL11.glTranslatef(0.5f, 0.0f, 0.0f);
+        GLRenderer.modelM4f().scale(0.5f, 0.5f, 0.5f);
+        GLRenderer.modelM4f().translate(0.5f, 0.0f, 0.0f);
 
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glDisable(GL11.GL_CULL_FACE);
+        GLRenderer.disableState(State.CULL_FACE);
 
         renderHeadBlock(tessellator, textureManager);
         renderFootBlock(tessellator, textureManager);
 
-        GL11.glEnable(GL11.GL_CULL_FACE);
-        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+        GLRenderer.enableState(State.CULL_FACE);
 
-        GL11.glPopMatrix();
+        GLRenderer.popFrame();
 
-        GL11.glEnable(GL11.GL_CULL_FACE);
-        GL11.glDisable(GL11.GL_BLEND);
+        GLRenderer.enableState(State.CULL_FACE);
+        GLRenderer.disableState(State.BLEND);
     }
 
-    private void renderHeadBlock(Tessellator t, TextureManager textureManager) {
+    private void renderHeadBlock(TessellatorGeneral t, TextureManager textureManager) {
         textureManager.loadTexture(HEAD_TOP).bind();
         t.startDrawingQuads();
         t.setNormal(0, 1, 0);
@@ -119,7 +120,7 @@ public class ItemModelPlacedBedroll extends ItemModelStandard {
         t.draw();
     }
 
-    private void renderFootBlock(Tessellator t, TextureManager textureManager) {
+    private void renderFootBlock(TessellatorGeneral t, TextureManager textureManager) {
         textureManager.loadTexture(FOOT_TOP).bind();
         t.startDrawingQuads();
         t.setNormal(0, 1, 0);

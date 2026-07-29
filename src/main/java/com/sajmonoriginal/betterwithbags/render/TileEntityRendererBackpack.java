@@ -7,7 +7,10 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.block.model.BlockModel;
 import net.minecraft.client.render.block.model.BlockModelDispatcher;
-import net.minecraft.client.render.tessellator.Tessellator;
+import net.minecraft.client.render.renderer.BlendFactor;
+import net.minecraft.client.render.renderer.GLRenderer;
+import net.minecraft.client.render.renderer.State;
+import net.minecraft.client.render.tessellator.TessellatorGeneral;
 import net.minecraft.client.render.texture.stitcher.TextureRegistry;
 import net.minecraft.client.render.tileentity.TileEntityRenderer;
 import net.minecraft.core.block.Block;
@@ -16,8 +19,6 @@ import com.sajmonoriginal.betterwithbags.block.BackpackBlocks;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.item.block.ItemBlock;
 import net.minecraft.core.util.helper.Direction;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 import org.useless.dragonfly.data.entity.mojang.EntityGeometryMojangData;
 import org.useless.dragonfly.models.entity.StaticEntityModel;
 
@@ -57,7 +58,7 @@ public class TileEntityRendererBackpack extends TileEntityRenderer<TileEntityBac
     }
 
     private float getRotationFromMeta(int meta) {
-        Direction dir = Direction.getDirectionById(meta);
+        Direction dir = Direction.fromId(meta);
         if (dir == Direction.NORTH) return 180f;
         if (dir == Direction.SOUTH) return 0f;
         if (dir == Direction.WEST) return 90f;
@@ -67,7 +68,8 @@ public class TileEntityRendererBackpack extends TileEntityRenderer<TileEntityBac
 
     private BackpackTier getDisplayTier(TileEntityBackpack tileEntity) {
         if (tileEntity.worldObj != null) {
-            int blockId = tileEntity.worldObj.getBlockId(tileEntity.x, tileEntity.y, tileEntity.z);
+            Block<?> block = tileEntity.worldObj.getBlockType(tileEntity.tilePos);
+            int blockId = block == null ? 0 : block.id();
             BackpackTier blockTier = BackpackBlocks.getTierForBlockId(blockId);
             if (blockTier != null) return blockTier;
         }
@@ -75,7 +77,7 @@ public class TileEntityRendererBackpack extends TileEntityRenderer<TileEntityBac
     }
 
     @Override
-    public void doRender(Tessellator tessellator, TileEntityBackpack tileEntity, double x, double y, double z, float partialTick) {
+    public void doRender(TessellatorGeneral tessellator, TileEntityBackpack tileEntity, double x, double y, double z, float partialTick) {
         boolean hasBedroll = tileEntity.hasAttachment();
         StaticEntityModel backpackModel = getModel();
         if (backpackModel == null) {
@@ -86,22 +88,21 @@ public class TileEntityRendererBackpack extends TileEntityRenderer<TileEntityBac
         int meta = tileEntity.getBlockMeta();
         float rotation = getRotationFromMeta(meta);
 
-        GL11.glPushMatrix();
+        GLRenderer.pushFrame();
 
         float scale = 1.0f / 16.0f;
-        GL11.glTranslatef((float) x + 0.5f, (float) y, (float) z + 0.5f);
-        GL11.glScalef(scale, scale, scale);
-        GL11.glTranslatef(0.0f, -13.5f, 0.0f);
-        GL11.glRotatef(rotation, 0.0f, 1.0f, 0.0f);
+        GLRenderer.modelM4f().translate((float) x + 0.5f, (float) y, (float) z + 0.5f);
+        GLRenderer.modelM4f().scale(scale, scale, scale);
+        GLRenderer.modelM4f().translate(0.0f, -13.5f, 0.0f);
+        GLRenderer.modelM4f().rotateY((float)Math.toRadians(rotation));
 
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_CULL_FACE);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        GLRenderer.enableState(State.BLEND);
+        GLRenderer.disableState(State.CULL_FACE);
+        GLRenderer.setBlendFunc(BlendFactor.SRC_ALPHA, BlendFactor.ONE_MINUS_SRC_ALPHA);
+        GLRenderer.setColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-        loadTexture(getTexture(tier));
-        backpackModel.render(tessellator);
+        bindTexture(getTexture(tier));
+        backpackModel.render();
 
         if (hasBedroll) {
             if (!bedrollTextureChecked) {
@@ -120,16 +121,15 @@ public class TileEntityRendererBackpack extends TileEntityRenderer<TileEntityBac
             if (bedrollTextureValid) {
                 StaticEntityModel bedroll = getBedrollModel();
                 if (bedroll != null) {
-                    loadTexture(BEDROLL_TEXTURE);
-                    bedroll.render(tessellator);
+                    bindTexture(BEDROLL_TEXTURE);
+                    bedroll.render();
                 }
             }
         }
 
-        GL11.glEnable(GL11.GL_CULL_FACE);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+        GLRenderer.enableState(State.CULL_FACE);
+        GLRenderer.disableState(State.BLEND);
 
-        GL11.glPopMatrix();
+        GLRenderer.popFrame();
     }
 }

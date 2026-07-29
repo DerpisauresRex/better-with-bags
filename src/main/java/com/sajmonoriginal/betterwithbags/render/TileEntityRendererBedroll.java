@@ -4,16 +4,17 @@ import com.sajmonoriginal.betterwithbags.BetterWithBagsMod;
 import com.sajmonoriginal.betterwithbags.block.TileEntityBedroll;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.tessellator.Tessellator;
+import net.minecraft.client.render.renderer.BlendFactor;
+import net.minecraft.client.render.renderer.GLRenderer;
+import net.minecraft.client.render.renderer.State;
+import net.minecraft.client.render.tessellator.TessellatorGeneral;
 import net.minecraft.client.render.tileentity.TileEntityRenderer;
-import org.lwjgl.opengl.GL11;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityRendererBedroll extends TileEntityRenderer<TileEntityBedroll> {
 
     private static final String TEX_BASE = "/assets/" + BetterWithBagsMod.MOD_ID + "/textures/block/bedroll/";
 
-    // IMPORTANT: Head and foot are SWAPPED here to fix orientation
     private static final String HEAD_TOP = TEX_BASE + "foot_top.png";
     private static final String HEAD_BOTTOM = TEX_BASE + "foot_bottom.png";
     private static final String HEAD_SIDE = TEX_BASE + "foot_side.png";
@@ -29,33 +30,43 @@ public class TileEntityRendererBedroll extends TileEntityRenderer<TileEntityBedr
     private static final float SIDE_V1 = 1f;
 
     @Override
-    public void doRender(Tessellator tessellator, TileEntityBedroll tileEntity, double x, double y, double z, float partialTick) {
+    public void doRender(TessellatorGeneral tessellator, TileEntityBedroll tileEntity, double x, double y, double z, float partialTick) {
         if (tileEntity.isFoot()) {
             return;
         }
 
         int direction = tileEntity.getDirection();
 
-        GL11.glPushMatrix();
-        GL11.glTranslatef((float) x + 0.5f, (float) y, (float) z + 0.5f);
-        GL11.glRotatef(getRotation(direction), 0.0f, 1.0f, 0.0f);
-        GL11.glTranslatef(-0.5f, 0.0f, -0.5f);
+        float footDx, footDz;
+        switch (direction) {
+            case 0: footDx =  0; footDz = -1; break;
+            case 1: footDx =  1; footDz =  0; break;
+            case 2: footDx =  0; footDz =  1; break;
+            case 3: footDx = -1; footDz =  0; break;
+            default: footDx = 0; footDz = 0; break;
+        }
 
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        GL11.glDisable(GL11.GL_CULL_FACE);
+        GLRenderer.pushFrame();
+
+        GLRenderer.modelM4f().translate((float) x + 0.5f + footDx, (float) y, (float) z + 0.5f + footDz);
+        GLRenderer.modelM4f().rotateY((float) Math.toRadians(getRotation(direction)));
+        GLRenderer.modelM4f().translate(-0.5f, 0.0f, -0.5f);
+
+        GLRenderer.enableState(State.BLEND);
+        GLRenderer.setBlendFunc(BlendFactor.SRC_ALPHA, BlendFactor.ONE_MINUS_SRC_ALPHA);
+        GLRenderer.setColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        GLRenderer.disableState(State.CULL_FACE);
 
         renderHeadBlock(tessellator);
         renderFootBlock(tessellator);
 
-        GL11.glEnable(GL11.GL_CULL_FACE);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glPopMatrix();
+        GLRenderer.enableState(State.CULL_FACE);
+        GLRenderer.disableState(State.BLEND);
+        GLRenderer.popFrame();
     }
 
-    private void renderHeadBlock(Tessellator t) {
-        loadTexture(HEAD_TOP);
+    private void renderHeadBlock(TessellatorGeneral t) {
+        bindTexture(HEAD_TOP);
         t.startDrawingQuads();
         t.setNormal(0, 1, 0);
         t.addVertexWithUV(0, H, 0, 0, 0);
@@ -64,7 +75,7 @@ public class TileEntityRendererBedroll extends TileEntityRenderer<TileEntityBedr
         t.addVertexWithUV(1, H, 0, 0, 1);
         t.draw();
 
-        loadTexture(HEAD_BOTTOM);
+        bindTexture(HEAD_BOTTOM);
         t.startDrawingQuads();
         t.setNormal(0, -1, 0);
         t.addVertexWithUV(1, 0, 0, 0, 1);
@@ -73,7 +84,7 @@ public class TileEntityRendererBedroll extends TileEntityRenderer<TileEntityBedr
         t.addVertexWithUV(0, 0, 0, 0, 0);
         t.draw();
 
-        loadTexture(HEAD_FRONT);
+        bindTexture(HEAD_FRONT);
         t.startDrawingQuads();
         t.setNormal(0, 0, -1);
         t.addVertexWithUV(0, H, 0, 0, SIDE_V0);
@@ -82,7 +93,7 @@ public class TileEntityRendererBedroll extends TileEntityRenderer<TileEntityBedr
         t.addVertexWithUV(0, 0, 0, 0, SIDE_V1);
         t.draw();
 
-        loadTexture(HEAD_SIDE);
+        bindTexture(HEAD_SIDE);
         t.startDrawingQuads();
         t.setNormal(-1, 0, 0);
         t.addVertexWithUV(0, H, 0, 0, SIDE_V0);
@@ -91,7 +102,7 @@ public class TileEntityRendererBedroll extends TileEntityRenderer<TileEntityBedr
         t.addVertexWithUV(0, H, 1, 1, SIDE_V0);
         t.draw();
 
-        loadTexture(HEAD_SIDE);
+        bindTexture(HEAD_SIDE);
         t.startDrawingQuads();
         t.setNormal(1, 0, 0);
         t.addVertexWithUV(1, H, 1, 1, SIDE_V0);
@@ -101,8 +112,8 @@ public class TileEntityRendererBedroll extends TileEntityRenderer<TileEntityBedr
         t.draw();
     }
 
-    private void renderFootBlock(Tessellator t) {
-        loadTexture(FOOT_TOP);
+    private void renderFootBlock(TessellatorGeneral t) {
+        bindTexture(FOOT_TOP);
         t.startDrawingQuads();
         t.setNormal(0, 1, 0);
         t.addVertexWithUV(0, H, 1, 0, 0);
@@ -111,7 +122,7 @@ public class TileEntityRendererBedroll extends TileEntityRenderer<TileEntityBedr
         t.addVertexWithUV(1, H, 1, 0, 1);
         t.draw();
 
-        loadTexture(FOOT_BOTTOM);
+        bindTexture(FOOT_BOTTOM);
         t.startDrawingQuads();
         t.setNormal(0, -1, 0);
         t.addVertexWithUV(1, 0, 1, 0, 1);
@@ -120,7 +131,7 @@ public class TileEntityRendererBedroll extends TileEntityRenderer<TileEntityBedr
         t.addVertexWithUV(0, 0, 1, 0, 0);
         t.draw();
 
-        loadTexture(FOOT_FRONT);
+        bindTexture(FOOT_FRONT);
         t.startDrawingQuads();
         t.setNormal(0, 0, 1);
         t.addVertexWithUV(1, H, 2, 0, SIDE_V0);
@@ -129,7 +140,7 @@ public class TileEntityRendererBedroll extends TileEntityRenderer<TileEntityBedr
         t.addVertexWithUV(1, 0, 2, 0, SIDE_V1);
         t.draw();
 
-        loadTexture(FOOT_SIDE);
+        bindTexture(FOOT_SIDE);
         t.startDrawingQuads();
         t.setNormal(-1, 0, 0);
         t.addVertexWithUV(0, H, 1, 0, SIDE_V0);
@@ -138,7 +149,7 @@ public class TileEntityRendererBedroll extends TileEntityRenderer<TileEntityBedr
         t.addVertexWithUV(0, H, 2, 1, SIDE_V0);
         t.draw();
 
-        loadTexture(FOOT_SIDE);
+        bindTexture(FOOT_SIDE);
         t.startDrawingQuads();
         t.setNormal(1, 0, 0);
         t.addVertexWithUV(1, H, 2, 1, SIDE_V0);
