@@ -16,6 +16,7 @@
 		"accessor.PlayerAccessor"
 	],
 	"client": [
+		"client.EntityGeometryMojangDataCacheMixin",
 		"client.MobRendererPlayerMixin",
 		"client.MobRendererPlayerArmorMixin",
 		"client.PacketHandlerClientMixinBackpack",
