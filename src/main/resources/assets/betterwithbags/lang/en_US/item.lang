@@ -1,0 +1,12 @@
+item.betterwithbags.backpack.small.name=Small Leather Satchel
+item.betterwithbags.backpack.small.desc=A simple leather pouch. +9 inventory slots.
+item.betterwithbags.backpack.medium.name=Medium Leather Backpack
+item.betterwithbags.backpack.medium.desc=A sturdy travel pack. +18 inventory slots.
+item.betterwithbags.backpack.large.name=Large Leather Backpack
+item.betterwithbags.backpack.large.desc=A spacious hiking pack. +27 inventory slots. Slightly slows movement.
+item.betterwithbags.backpack.reinforced.name=Reinforced Traveler's Pack
+item.betterwithbags.backpack.reinforced.desc=Maximum storage capacity. +36 inventory slots. Slows movement.
+item.betterwithbags.backpack.nether.name=Nether Explorer's Pack
+item.betterwithbags.backpack.nether.desc=Fire-resistant pack with olivine magic. +27 inventory slots.
+item.betterwithbags.bedroll.name=Bedroll
+item.betterwithbags.bedroll.desc=A portable sleeping roll. Skips the night without setting spawn.
