@@ -8,8 +8,9 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.container.ScreenInventory;
 import net.minecraft.client.gui.container.ScreenInventoryCreative;
+import net.minecraft.client.render.renderer.GLRenderer;
+import net.minecraft.client.render.renderer.State;
 import net.minecraft.core.player.inventory.menu.MenuInventory;
-import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,7 +35,6 @@ public abstract class ScreenInventoryCreativeMixin extends ScreenInventory {
     private static final int EXTENSION_TITLE_HEIGHT = 14;
     @Unique
     private static final int EXTENSION_BOTTOM_HEIGHT = 7;
-
 
     @Unique
     private boolean bwb$creative$lastHadBackpack = false;
@@ -96,8 +96,8 @@ public abstract class ScreenInventoryCreativeMixin extends ScreenInventory {
 
         int panelY = guiTop + STANDARD_HEIGHT - EXTENSION_OVERLAP;
 
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GLRenderer.enableState(State.BLEND);
+        GLRenderer.setColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.textureManager.loadTexture(EXTENSION_TEXTURE_BASE + tier.getName() + ".png").bind();
 
         int panelHeight = EXTENSION_OVERLAP + EXTENSION_TITLE_HEIGHT + rows * ROW_HEIGHT + EXTENSION_BOTTOM_HEIGHT;
@@ -109,7 +109,7 @@ public abstract class ScreenInventoryCreativeMixin extends ScreenInventory {
 
         String tierName = tier.getName();
         tierName = tierName.substring(0, 1).toUpperCase() + tierName.substring(1);
-        this.font.drawString(tierName + " Backpack", guiLeft + 8, panelY + EXTENSION_OVERLAP + 4, 0xFFFFFF);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        this.fontRenderer.render(tierName + " Backpack", guiLeft + 8, panelY + EXTENSION_OVERLAP + 4).setColor(0xFFFFFF).call();
+        GLRenderer.setColor4f(1.0F, 1.0F, 1.0F, 1.0F);
     }
 }

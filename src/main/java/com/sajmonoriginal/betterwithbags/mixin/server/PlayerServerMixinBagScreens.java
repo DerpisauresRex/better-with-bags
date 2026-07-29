@@ -32,10 +32,10 @@ public abstract class PlayerServerMixinBagScreens implements BagScreens {
                 "container.backpack",
                 0)
         );
-        playerServer.craftingInventory.onCraftGuiClosed(playerServer);
-        playerServer.craftingInventory = new ContainerBackpack(playerServer.inventory, backpackStack);
-        playerServer.craftingInventory.containerId = this.currentWindowId;
-        playerServer.craftingInventory.addSlotListener(playerServer);
+        playerServer.containerMenu.onCraftGuiClosed(playerServer);
+        playerServer.containerMenu = new ContainerBackpack(playerServer.inventory, backpackStack);
+        playerServer.containerMenu.containerId = this.currentWindowId;
+        playerServer.containerMenu.addSlotListener(playerServer);
     }
 
     @Override
@@ -48,9 +48,9 @@ public abstract class PlayerServerMixinBagScreens implements BagScreens {
                 tileEntity.getNameTranslationKey(),
                 tileEntity.getTier().ordinal())
         );
-        playerServer.craftingInventory.onCraftGuiClosed(playerServer);
-        playerServer.craftingInventory = new ContainerBackpackBlock(playerServer.inventory, tileEntity);
-        playerServer.craftingInventory.containerId = this.currentWindowId;
-        playerServer.craftingInventory.addSlotListener(playerServer);
+        playerServer.containerMenu.onCraftGuiClosed(playerServer);
+        playerServer.containerMenu = new ContainerBackpackBlock(playerServer.inventory, tileEntity);
+        playerServer.containerMenu.containerId = this.currentWindowId;
+        playerServer.containerMenu.addSlotListener(playerServer);
     }
 }

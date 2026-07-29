@@ -7,7 +7,7 @@ import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.player.inventory.container.ContainerInventory;
 import net.minecraft.core.world.World;
-import net.minecraft.core.world.chunk.ChunkCoordinates;
+import net.minecraft.core.world.pos.TilePos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,9 +20,6 @@ public abstract class PlayerMixin extends Entity {
 
     @Shadow
     public ContainerInventory inventory;
-
-    @Shadow
-    public abstract void dropPlayerItemWithRandomChoice(ItemStack itemStack, boolean flag);
 
     protected PlayerMixin(World world) {
         super(world);
@@ -49,21 +46,21 @@ public abstract class PlayerMixin extends Entity {
 
     @Redirect(
         method = "sleepInBedAt",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/core/entity/player/Player;sendTranslatedChatMessage(Ljava/lang/String;)V")
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/core/entity/player/Player;sendStatusMessageTranslated(Ljava/lang/String;[Ljava/lang/String;)V")
     )
-    private void bwb$redirectSpawnMessage(Player self, String key) {
+    private void bwb$redirectSpawnMessage(Player self, String key, String[] args) {
         if (!BedrollSleepTracker.isSleepingInBedroll(self)) {
-            self.sendTranslatedChatMessage(key);
+            self.sendStatusMessageTranslated(key, args);
         }
     }
 
     @Redirect(
         method = "sleepInBedAt",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/core/entity/player/Player;setPlayerSpawnCoordinate(Lnet/minecraft/core/world/chunk/ChunkCoordinates;)V")
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/core/entity/player/Player;setPlayerSpawnPoint(Lnet/minecraft/core/world/pos/TilePos;)V")
     )
-    private void bwb$redirectSpawnSet(Player self, ChunkCoordinates coords) {
+    private void bwb$redirectSpawnSet(Player self, TilePos coords) {
         if (!BedrollSleepTracker.isSleepingInBedroll(self)) {
-            self.setPlayerSpawnCoordinate(coords);
+            self.setPlayerSpawnPoint(coords);
         }
     }
 
@@ -78,8 +75,7 @@ public abstract class PlayerMixin extends Entity {
         if (this.world != null && this.world.isBlockLoaded(x, y, z)) {
             net.minecraft.core.block.Block<?> block = this.world.getBlock(x, y, z);
             if (block != null && block.getLogic() instanceof com.sajmonoriginal.betterwithbags.block.BlockLogicBedroll) {
-                // Bed surface: y + 0.5625 → sleep Y: y + 0.9375
-                // Bedroll surface: y + 0.1875 → sleep Y: y + 0.5625 (0.375 lower)
+
                 this.setPos(this.x, (double) y + 0.5625, this.z);
             }
         }

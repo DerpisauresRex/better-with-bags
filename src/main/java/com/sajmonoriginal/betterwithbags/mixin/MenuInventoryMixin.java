@@ -9,6 +9,7 @@ import com.sajmonoriginal.betterwithbags.slot.SlotBackpackAttachment;
 import com.sajmonoriginal.betterwithbags.util.BackpackMenuCapable;
 import net.minecraft.core.InventoryAction;
 import net.minecraft.core.entity.player.Player;
+import net.minecraft.core.enums.HumanArmorShape;
 import net.minecraft.core.item.IArmorItem;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.player.inventory.container.Container;
@@ -22,6 +23,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,10 +77,9 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
         return this.bwb$backpackRows;
     }
 
-    @Inject(method = "<init>(Lnet/minecraft/core/player/inventory/container/ContainerInventory;Z)V",
-            at = @At(value = "INVOKE",
-                     target = "Lnet/minecraft/core/player/inventory/menu/MenuInventory;slotsChanged(Lnet/minecraft/core/player/inventory/container/Container;)V"))
-    private void bwb$addBackpackSlotsInConstructor(ContainerInventory inventory, boolean active, CallbackInfo ci) {
+    @Inject(method = "<init>(Lnet/minecraft/core/player/inventory/container/ContainerInventory;)V",
+            at = @At("RETURN"))
+    private void bwb$addBackpackSlotsInConstructor(ContainerInventory inventory, CallbackInfo ci) {
         MenuInventory self = (MenuInventory) (Object) this;
         this.bwb$backpackSlotStartIndex = self.slots.size();
 
@@ -100,7 +103,7 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
             return;
         }
 
-        ItemStack chestSlot = inventory.player.inventory.armorInventory[2];
+        ItemStack chestSlot = inventory.player.inventory.armorInventory[HumanArmorShape.CHEST.getSlotIndex()];
         boolean hasBackpack = chestSlot != null && chestSlot.getItem() instanceof ItemBackpack;
 
         if (!hasBackpack) {
@@ -165,7 +168,7 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
 
     @Inject(method = "getTargetSlots", at = @At("HEAD"), cancellable = true)
     private void bwb$addBackpackTargets(InventoryAction action, Slot slot, int button, Player player,
-                                         CallbackInfoReturnable<List<Integer>> cir) {
+                                         CallbackInfoReturnable<IntList> cir) {
         if (!bwb$hasBackpackSlots || bwb$backpackSlotStartIndex < 0) return;
 
         int capacity = bwb$backpackRows * 9;
@@ -177,7 +180,7 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
                 && slot.getItemStack().getItem() instanceof IArmorItem) {
                 return;
             }
-            List<Integer> targets = new ArrayList<>();
+            IntList targets = new IntArrayList();
             for (int i = 0; i < capacity; i++) {
                 targets.add(bwb$backpackSlotStartIndex + i);
             }

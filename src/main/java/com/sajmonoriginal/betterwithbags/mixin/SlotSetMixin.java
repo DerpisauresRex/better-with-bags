@@ -23,10 +23,6 @@ public abstract class SlotSetMixin {
     @Shadow
     public abstract void setChanged();
 
-    /**
-     * @author BetterWithBags
-     * @reason Prevent NPE when ItemStack has unregistered item ID (removed mod items)
-     */
     @Overwrite
     public void set(ItemStack itemstack) {
         this.container.setItem(this.slot, itemstack);

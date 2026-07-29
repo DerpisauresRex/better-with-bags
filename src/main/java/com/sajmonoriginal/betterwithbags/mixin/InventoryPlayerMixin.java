@@ -15,11 +15,11 @@ public abstract class InventoryPlayerMixin {
     public ItemStack[] armorInventory;
 
     @Shadow
-    protected int currentItem;
+    private int currentSlot;
 
     @Shadow
-    protected int hotbarOffset;
+    private int hotbarOffset;
 
     @Shadow
-    public abstract boolean currentItemLocked();
+    public abstract boolean currentSlotLocked();
 }

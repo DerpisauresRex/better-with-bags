@@ -8,9 +8,10 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.container.ScreenContainerAbstract;
 import net.minecraft.client.gui.container.ScreenInventory;
+import net.minecraft.client.render.renderer.GLRenderer;
+import net.minecraft.client.render.renderer.State;
 import net.minecraft.core.player.inventory.menu.MenuAbstract;
 import net.minecraft.core.player.inventory.menu.MenuInventory;
-import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -35,7 +36,6 @@ public abstract class ScreenInventoryMixin extends ScreenContainerAbstract {
     private static final int EXTENSION_TITLE_HEIGHT = 14;
     @Unique
     private static final int EXTENSION_BOTTOM_HEIGHT = 7;
-
 
     @Unique
     private int bwb$backpackRows = 0;
@@ -107,8 +107,8 @@ public abstract class ScreenInventoryMixin extends ScreenContainerAbstract {
 
         int panelY = guiTop + STANDARD_HEIGHT - EXTENSION_OVERLAP;
 
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GLRenderer.enableState(State.BLEND);
+        GLRenderer.setColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         String extTexture = EXTENSION_TEXTURE_BASE + this.bwb$currentTier.getName() + ".png";
         this.mc.textureManager.loadTexture(extTexture).bind();
 
@@ -123,7 +123,7 @@ public abstract class ScreenInventoryMixin extends ScreenContainerAbstract {
 
         String tierName = this.bwb$currentTier.getName();
         tierName = tierName.substring(0, 1).toUpperCase() + tierName.substring(1);
-        this.font.drawString(tierName + " Backpack", guiLeft + 8, panelY + EXTENSION_OVERLAP + 4, 0xFFFFFF);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        this.fontRenderer.render(tierName + " Backpack", guiLeft + 8, panelY + EXTENSION_OVERLAP + 4).setColor(0xFFFFFF).call();
+        GLRenderer.setColor4f(1.0F, 1.0F, 1.0F, 1.0F);
     }
 }

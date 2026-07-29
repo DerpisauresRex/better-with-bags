@@ -26,7 +26,7 @@ public abstract class PacketHandlerClientMixinBackpack {
     @Shadow
     private Minecraft mc;
 
-    @Inject(method = "handleOpenWindow", at = @At("TAIL"))
+    @Inject(method = "handleContainerOpen", at = @At("TAIL"))
     private void bwb$handleBackpackScreens(PacketContainerOpen packet, CallbackInfo ci) {
         PlayerLocal playerLocal = this.mc.thePlayer;
         BagScreens playerScreen = (BagScreens) playerLocal;
@@ -35,7 +35,7 @@ public abstract class PacketHandlerClientMixinBackpack {
             ItemStack heldItem = playerLocal.getCurrentEquippedItem();
             if (heldItem != null && heldItem.getItem() instanceof ItemBackpack) {
                 playerScreen.betterWithBags$displayBackpackScreen(heldItem);
-                playerLocal.craftingInventory.containerId = packet.windowId;
+                playerLocal.containerMenu.containerId = packet.windowId;
             }
         }
 
@@ -48,7 +48,7 @@ public abstract class PacketHandlerClientMixinBackpack {
             TileEntityBackpack dummy = new TileEntityBackpack();
             dummy.setTier(tier);
             playerScreen.betterWithBags$displayBackpackBlockScreen(dummy);
-            playerLocal.craftingInventory.containerId = packet.windowId;
+            playerLocal.containerMenu.containerId = packet.windowId;
         }
     }
 }
