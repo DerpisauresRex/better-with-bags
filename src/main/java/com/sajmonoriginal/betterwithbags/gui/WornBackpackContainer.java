@@ -117,6 +117,6 @@ public class WornBackpackContainer implements Container {
     }
 
     @Override
-    public void sortContainer() {
+    public void sort() {
     }
 }

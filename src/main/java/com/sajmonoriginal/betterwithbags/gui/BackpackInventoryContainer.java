@@ -23,7 +23,6 @@ public class BackpackInventoryContainer implements Container {
         this.contents = nbtContents != null ? nbtContents : new ItemStack[capacity];
     }
 
-    // Live lookup — server replaces the ItemStack via copyItemStack() in handlePlace after onUseItem returns
     private ItemStack getBackpackStack() {
         return playerInventory.mainInventory[slotIndex];
     }
@@ -100,6 +99,6 @@ public class BackpackInventoryContainer implements Container {
     }
 
     @Override
-    public void sortContainer() {
+    public void sort() {
     }
 }

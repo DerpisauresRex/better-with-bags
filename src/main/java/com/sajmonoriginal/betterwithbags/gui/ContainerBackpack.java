@@ -10,9 +10,8 @@ import net.minecraft.core.player.inventory.container.ContainerInventory;
 import net.minecraft.core.player.inventory.menu.MenuAbstract;
 import net.minecraft.core.player.inventory.slot.Slot;
 import net.minecraft.server.entity.player.PlayerServer;
-
-import java.util.Collections;
-import java.util.List;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntLists;
 
 public class ContainerBackpack extends MenuAbstract {
     private final BackpackTier tier;
@@ -24,7 +23,7 @@ public class ContainerBackpack extends MenuAbstract {
 
     public ContainerBackpack(ContainerInventory playerInventory, ItemStack backpackStack) {
         this.playerInventory = playerInventory;
-        this.heldSlotIndex = playerInventory.getCurrentItemIndex();
+        this.heldSlotIndex = playerInventory.getCurrentSlot();
         ItemBackpack backpack = (ItemBackpack) backpackStack.getItem();
         this.tier = backpack.getTier();
         this.rows = tier.getRows();
@@ -40,8 +39,8 @@ public class ContainerBackpack extends MenuAbstract {
             }
         }
 
-        boolean supportsAttachment = tier == BackpackTier.LARGE || 
-                                      tier == BackpackTier.REINFORCED || 
+        boolean supportsAttachment = tier == BackpackTier.LARGE ||
+                                      tier == BackpackTier.REINFORCED ||
                                       tier == BackpackTier.NETHER;
         if (supportsAttachment) {
             this.addSlot(new SlotAttachment(playerInventory, heldSlotIndex, 178, 18));
@@ -69,7 +68,7 @@ public class ContainerBackpack extends MenuAbstract {
     }
 
     @Override
-    public List<Integer> getMoveSlots(InventoryAction action, Slot slot, int target, Player player) {
+    public IntList getMoveSlots(InventoryAction action, Slot slot, int target, Player player) {
         int attachmentSlot = capacity;
         int playerStart = capacity + 1;
         if (slot.index < capacity) {
@@ -90,7 +89,7 @@ public class ContainerBackpack extends MenuAbstract {
     }
 
     @Override
-    public List<Integer> getTargetSlots(InventoryAction action, Slot slot, int target, Player player) {
+    public IntList getTargetSlots(InventoryAction action, Slot slot, int target, Player player) {
         int attachmentSlot = capacity;
         int playerStart = capacity + 1;
         if (slot.index < capacity) {
@@ -102,7 +101,7 @@ public class ContainerBackpack extends MenuAbstract {
         if (slot.index >= playerStart) {
             ItemStack stack = slot.getItemStack();
             if (stack != null && stack.getItem() instanceof ItemBackpack) {
-                return Collections.emptyList();
+                return IntLists.EMPTY_LIST;
             }
             if (stack != null && stack.getItem() instanceof com.sajmonoriginal.betterwithbags.item.ItemBedroll) {
                 Slot attSlot = this.getSlot(attachmentSlot);
@@ -112,7 +111,7 @@ public class ContainerBackpack extends MenuAbstract {
             }
             return this.getSlots(0, capacity, false);
         }
-        return Collections.emptyList();
+        return IntLists.EMPTY_LIST;
     }
 
     @Override
@@ -136,7 +135,8 @@ public class ContainerBackpack extends MenuAbstract {
     private void syncHeldItemToClient(Player player) {
         PlayerServer serverPlayer = (PlayerServer) player;
         serverPlayer.playerNetServerHandler.sendPacket(
-            new PacketContainerSetSlot(0, heldSlotIndex + 36, player.inventory.mainInventory[heldSlotIndex])
+            new PacketContainerSetSlot(0, serverPlayer.inventoryMenu.getStateId(), heldSlotIndex + 36,
+                player.inventory.mainInventory[heldSlotIndex])
         );
     }
 

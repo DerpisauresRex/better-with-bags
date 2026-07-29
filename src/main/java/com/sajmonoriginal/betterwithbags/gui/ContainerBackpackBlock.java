@@ -9,9 +9,8 @@ import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.player.inventory.container.ContainerInventory;
 import net.minecraft.core.player.inventory.menu.MenuAbstract;
 import net.minecraft.core.player.inventory.slot.Slot;
-
-import java.util.Collections;
-import java.util.List;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntLists;
 
 public class ContainerBackpackBlock extends MenuAbstract {
     private final TileEntityBackpack tileEntity;
@@ -34,8 +33,8 @@ public class ContainerBackpackBlock extends MenuAbstract {
             }
         }
 
-        boolean supportsAttachment = tier == BackpackTier.LARGE || 
-                                      tier == BackpackTier.REINFORCED || 
+        boolean supportsAttachment = tier == BackpackTier.LARGE ||
+                                      tier == BackpackTier.REINFORCED ||
                                       tier == BackpackTier.NETHER;
         if (supportsAttachment) {
             this.addSlot(new SlotAttachmentBlock(tileEntity, 178, 18));
@@ -63,7 +62,7 @@ public class ContainerBackpackBlock extends MenuAbstract {
     }
 
     @Override
-    public List<Integer> getMoveSlots(InventoryAction action, Slot slot, int target, Player player) {
+    public IntList getMoveSlots(InventoryAction action, Slot slot, int target, Player player) {
         int attachmentSlot = capacity;
         int playerStart = capacity + 1;
         if (slot.index < capacity) {
@@ -84,7 +83,7 @@ public class ContainerBackpackBlock extends MenuAbstract {
     }
 
     @Override
-    public List<Integer> getTargetSlots(InventoryAction action, Slot slot, int target, Player player) {
+    public IntList getTargetSlots(InventoryAction action, Slot slot, int target, Player player) {
         int attachmentSlot = capacity;
         int playerStart = capacity + 1;
         if (slot.index < capacity) {
@@ -96,7 +95,7 @@ public class ContainerBackpackBlock extends MenuAbstract {
         if (slot.index >= playerStart) {
             ItemStack stack = slot.getItemStack();
             if (stack != null && stack.getItem() instanceof ItemBackpack) {
-                return Collections.emptyList();
+                return IntLists.EMPTY_LIST;
             }
             if (stack != null && stack.getItem() instanceof com.sajmonoriginal.betterwithbags.item.ItemBedroll) {
                 Slot attSlot = this.getSlot(attachmentSlot);
@@ -106,7 +105,7 @@ public class ContainerBackpackBlock extends MenuAbstract {
             }
             return this.getSlots(0, capacity, false);
         }
-        return Collections.emptyList();
+        return IntLists.EMPTY_LIST;
     }
 
     @Override

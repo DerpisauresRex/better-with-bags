@@ -5,9 +5,10 @@ import com.sajmonoriginal.betterwithbags.item.BackpackTier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.container.ScreenContainerAbstract;
+import net.minecraft.client.render.renderer.GLRenderer;
+import net.minecraft.client.render.renderer.State;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.player.inventory.container.ContainerInventory;
-import org.lwjgl.opengl.GL11;
 
 @Environment(EnvType.CLIENT)
 public class ScreenBackpack extends ScreenContainerAbstract {
@@ -30,8 +31,8 @@ public class ScreenBackpack extends ScreenContainerAbstract {
 
     @Override
     public void drawGuiContainerBackgroundLayer(float partialTicks) {
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GLRenderer.enableState(State.BLEND);
+        GLRenderer.setColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.textureManager.loadTexture(guiTexture).bind();
 
         int guiLeft = (this.width - this.xSize) / 2;
@@ -49,8 +50,8 @@ public class ScreenBackpack extends ScreenContainerAbstract {
     @Override
     public void drawGuiContainerForegroundLayer() {
         String tierName = container.getTier().name().substring(0, 1) + container.getTier().name().substring(1).toLowerCase();
-        this.font.drawString(tierName + " Backpack", 8, 6, 0xFFFFFF);
-        this.font.drawString("Inventory", 8, this.ySize - 96 + 2, 0x404040);
+        this.fontRenderer.render(tierName + " Backpack", 8, 6).setColor(0xFFFFFF).call();
+        this.fontRenderer.render("Inventory", 8, this.ySize - 96 + 2).setColor(0x404040).call();
     }
 
     @Override

@@ -72,17 +72,17 @@ public class SlotBackpackAttachment extends Slot {
     public int getMaxStackSize() {
         return 1;
     }
-    
+
     @Override
     public boolean isLocked() {
         return !isActive();
     }
-    
+
     @Override
     public boolean enableDragAndPickup() {
         return isActive();
     }
-    
+
     @Override
     public boolean allowItemInteraction() {
         return isActive();
@@ -94,45 +94,45 @@ public class SlotBackpackAttachment extends Slot {
         if (stack == null) return false;
         return stack.getItem() instanceof ItemBedroll;
     }
-    
+
     public boolean isActive() {
         ItemStack backpackStack = getBackpackStack();
         if (backpackStack == null) return false;
         if (!(backpackStack.getItem() instanceof ItemBackpack)) return false;
-        
+
         ItemBackpack backpack = (ItemBackpack) backpackStack.getItem();
         BackpackTier tier = backpack.getTier();
         return tier == BackpackTier.LARGE || tier == BackpackTier.REINFORCED || tier == BackpackTier.NETHER;
     }
-    
+
     private static class DummyContainer implements Container {
         @Override
         public int getContainerSize() { return 1; }
-        
+
         @Override
         public ItemStack getItem(int slot) { return null; }
-        
+
         @Override
         public ItemStack removeItem(int slot, int amount) { return null; }
-        
+
         @Override
         public void setItem(int slot, ItemStack stack) { }
-        
+
         @Override
         public String getNameTranslationKey() { return ""; }
-        
+
         @Override
         public int getMaxStackSize() { return 1; }
-        
+
         @Override
         public void setChanged() { }
-        
+
         @Override
         public boolean stillValid(Player player) { return true; }
-        
+
         @Override
-        public void sortContainer() { }
-        
+        public void sort() { }
+
         @Override
         public boolean locked(int slot) { return false; }
     }
