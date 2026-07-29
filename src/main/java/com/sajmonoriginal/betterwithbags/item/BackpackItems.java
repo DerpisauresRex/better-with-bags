@@ -3,6 +3,8 @@ package com.sajmonoriginal.betterwithbags.item;
 import com.sajmonoriginal.betterwithbags.BetterWithBagsMod;
 import net.minecraft.core.item.Item;
 import turniplabs.halplibe.helper.ItemBuilder;
+import turniplabs.halplibe.helper.creativeInventory.CreativeInventoryCategory;
+import turniplabs.halplibe.helper.creativeInventory.CreativeInventoryPlacement;
 
 public class BackpackItems {
     private static int currentId = BetterWithBagsMod.itemIdStart;
@@ -19,6 +21,13 @@ public class BackpackItems {
         return BetterWithBagsMod.MOD_ID + ":item/" + name;
     }
 
+    private static ItemBuilder backpackBuilder() {
+        return new ItemBuilder(BetterWithBagsMod.MOD_ID)
+            .setStackSize(1)
+            .setCreativeInventoryPlacement(
+                new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS));
+    }
+
     public void initializeItems() {
         if (initialized) {
             BetterWithBagsMod.LOGGER.warn("BackpackItems.initializeItems() called twice - skipping");
@@ -26,28 +35,22 @@ public class BackpackItems {
         }
         initialized = true;
 
-        BACKPACK_SMALL = new ItemBuilder(BetterWithBagsMod.MOD_ID)
-            .setStackSize(1)
+        BACKPACK_SMALL = backpackBuilder()
             .build(new ItemBackpack("backpack.small", itemKey("backpack_small"), currentId++, BackpackTier.SMALL));
 
-        BACKPACK_MEDIUM = new ItemBuilder(BetterWithBagsMod.MOD_ID)
-            .setStackSize(1)
+        BACKPACK_MEDIUM = backpackBuilder()
             .build(new ItemBackpack("backpack.medium", itemKey("backpack_medium"), currentId++, BackpackTier.MEDIUM));
 
-        BACKPACK_LARGE = new ItemBuilder(BetterWithBagsMod.MOD_ID)
-            .setStackSize(1)
+        BACKPACK_LARGE = backpackBuilder()
             .build(new ItemBackpack("backpack.large", itemKey("backpack_large"), currentId++, BackpackTier.LARGE));
 
-        BACKPACK_REINFORCED = new ItemBuilder(BetterWithBagsMod.MOD_ID)
-            .setStackSize(1)
+        BACKPACK_REINFORCED = backpackBuilder()
             .build(new ItemBackpack("backpack.reinforced", itemKey("backpack_reinforced"), currentId++, BackpackTier.REINFORCED));
 
-        BACKPACK_NETHER = new ItemBuilder(BetterWithBagsMod.MOD_ID)
-            .setStackSize(1)
+        BACKPACK_NETHER = backpackBuilder()
             .build(new ItemBackpack("backpack.nether", itemKey("backpack_nether"), currentId++, BackpackTier.NETHER));
 
-        BEDROLL = new ItemBuilder(BetterWithBagsMod.MOD_ID)
-            .setStackSize(1)
+        BEDROLL = backpackBuilder()
             .build(new ItemBedroll("bedroll", itemKey("bedroll"), currentId++));
     }
 

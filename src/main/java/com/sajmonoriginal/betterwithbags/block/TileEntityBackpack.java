@@ -102,20 +102,18 @@ public class TileEntityBackpack extends TileEntity implements Container {
         if (worldObj == null) {
             return true;
         }
-        if (worldObj.getTileEntity(x, y, z) != this) {
+        if (worldObj.getTileEntity(tilePos) != this) {
             return false;
         }
-        return player.distanceTo(x + 0.5, y + 0.5, z + 0.5) <= 64.0;
+        return player.distanceTo(tilePos.x + 0.5, tilePos.y + 0.5, tilePos.z + 0.5) <= 64.0;
     }
 
     @Override
-    public void sortContainer() {
+    public void sort() {
     }
 
     @Override
-    public void readFromNBT(CompoundTag tag) {
-        super.readFromNBT(tag);
-
+    public void readAdditionalData(CompoundTag tag) {
         if (tag.containsKey("BackpackTier")) {
             String tierName = tag.getString("BackpackTier");
             try {
@@ -145,9 +143,7 @@ public class TileEntityBackpack extends TileEntity implements Container {
     }
 
     @Override
-    public void writeToNBT(CompoundTag tag) {
-        super.writeToNBT(tag);
-
+    public void writeAdditionalData(CompoundTag tag) {
         tag.putString("BackpackTier", tier.name());
 
         ListTag itemList = new ListTag();
@@ -170,8 +166,7 @@ public class TileEntityBackpack extends TileEntity implements Container {
 
     @Override
     public void dropContents(World world, int x, int y, int z) {
-        // Contents are preserved in the dropped item, not scattered
-        // So we intentionally do nothing here
+
     }
 
     @Override
@@ -179,8 +174,4 @@ public class TileEntityBackpack extends TileEntity implements Container {
         return new PacketTileEntityData(this);
     }
 
-    @Override
-    public boolean canBeCarried(World world, net.minecraft.core.entity.Entity entity) {
-        return false;
-    }
 }

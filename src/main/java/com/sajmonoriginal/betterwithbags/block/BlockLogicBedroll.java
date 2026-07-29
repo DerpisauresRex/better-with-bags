@@ -7,9 +7,12 @@ import net.minecraft.core.block.BlockLogicBed;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.enums.EnumDropCause;
+import net.minecraft.core.enums.EnumSleepStatus;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
+import net.minecraft.core.world.pos.TilePos;
+import net.minecraft.core.world.pos.TilePosc;
 
 public class BlockLogicBedroll extends BlockLogicBed {
 
@@ -19,19 +22,15 @@ public class BlockLogicBedroll extends BlockLogicBed {
     }
 
     @Override
-    public boolean onBlockRightClicked(World world, int x, int y, int z, Player player, Side side, double xPlaced, double yPlaced) {
-        if (world.isClientSide) {
-            return true;
-        }
-
+    public boolean onInteracted(World world, TilePosc pos, Player player, Side side, double hitX, double hitY) {
+        if (world.isClientSide) return true;
+        TilePos tilePos = new TilePos(pos);
         BedrollSleepTracker.markSleepingInBedroll(player);
-        boolean result = super.onBlockRightClicked(world, x, y, z, player, side, xPlaced, yPlaced);
-
-        if (!player.isPlayerSleeping()) {
+        EnumSleepStatus status = player.sleepInBedAt(tilePos.x, tilePos.y, tilePos.z);
+        if (status != null) {
             BedrollSleepTracker.clearSleepingInBedroll(player);
         }
-
-        return result;
+        return true;
     }
 
     @Override

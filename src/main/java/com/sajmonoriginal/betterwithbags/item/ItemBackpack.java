@@ -6,6 +6,7 @@ import com.sajmonoriginal.betterwithbags.block.BackpackBlocks;
 import com.sajmonoriginal.betterwithbags.block.TileEntityBackpack;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.entity.player.Player;
+import net.minecraft.core.enums.HumanArmorShape;
 import net.minecraft.core.item.IArmorItem;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
@@ -13,6 +14,7 @@ import net.minecraft.core.item.material.ArmorMaterial;
 import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
+import net.minecraft.core.world.pos.TilePosc;
 
 public class ItemBackpack extends Item implements IArmorItem {
 
@@ -37,7 +39,7 @@ public class ItemBackpack extends Item implements IArmorItem {
     }
 
     @Override
-    public ItemStack onUseItem(ItemStack itemStack, World world, Player player) {
+    public ItemStack onUse(ItemStack itemStack, World world, Player player) {
         if (!player.isSneaking()) {
             if (!world.isClientSide) {
                 ((com.sajmonoriginal.betterwithbags.gui.BagScreens) player).betterWithBags$displayBackpackScreen(itemStack);
@@ -47,7 +49,7 @@ public class ItemBackpack extends Item implements IArmorItem {
     }
 
     @Override
-    public boolean onUseItemOnBlock(ItemStack itemstack, Player player, World world, int x, int y, int z, Side side, double xOffset, double yOffset) {
+    public boolean onUseOnBlock(ItemStack itemstack, World world, Player player, TilePosc pos, Side side, double xOffset, double yOffset) {
         if (!player.isSneaking()) {
             if (!world.isClientSide) {
                 ((com.sajmonoriginal.betterwithbags.gui.BagScreens) player).betterWithBags$displayBackpackScreen(itemstack);
@@ -55,9 +57,9 @@ public class ItemBackpack extends Item implements IArmorItem {
             return true;
         }
 
-        int placeX = x + side.getOffsetX();
-        int placeY = y + side.getOffsetY();
-        int placeZ = z + side.getOffsetZ();
+        int placeX = pos.x() + side.offsetX();
+        int placeY = pos.y() + side.offsetY();
+        int placeZ = pos.z() + side.offsetZ();
 
         if (!world.isAirBlock(placeX, placeY, placeZ)) {
             return false;
@@ -68,8 +70,8 @@ public class ItemBackpack extends Item implements IArmorItem {
         }
 
         int blockId = BackpackBlocks.getBlockForTier(this.tier).id();
-        Direction facing = player.getHorizontalPlacementDirection(side).getOpposite();
-        world.setBlockAndMetadataWithNotify(placeX, placeY, placeZ, blockId, facing.getId());
+        Direction facing = player.getHorizontalPlacementDirection(side).opposite();
+        world.setBlockAndMetadataWithNotify(placeX, placeY, placeZ, blockId, facing.id);
 
         TileEntity te = world.getTileEntity(placeX, placeY, placeZ);
         if (te instanceof TileEntityBackpack) {
@@ -104,17 +106,17 @@ public class ItemBackpack extends Item implements IArmorItem {
     }
 
     @Override
-    public int getArmorPiece() {
-        return 2;
+    public HumanArmorShape getArmorShape() {
+        return HumanArmorShape.CHEST;
     }
 
     public static boolean isWearingBackpack(Player player) {
-        ItemStack chestSlot = player.inventory.armorInventory[2];
+        ItemStack chestSlot = player.inventory.armorInventory[HumanArmorShape.CHEST.getSlotIndex()];
         return chestSlot != null && chestSlot.getItem() instanceof ItemBackpack;
     }
 
     public static ItemBackpack getWornBackpack(Player player) {
-        ItemStack chestSlot = player.inventory.armorInventory[2];
+        ItemStack chestSlot = player.inventory.armorInventory[HumanArmorShape.CHEST.getSlotIndex()];
         if (chestSlot != null && chestSlot.getItem() instanceof ItemBackpack) {
             return (ItemBackpack) chestSlot.getItem();
         }
@@ -122,7 +124,7 @@ public class ItemBackpack extends Item implements IArmorItem {
     }
 
     public static ItemStack getWornBackpackStack(Player player) {
-        ItemStack chestSlot = player.inventory.armorInventory[2];
+        ItemStack chestSlot = player.inventory.armorInventory[HumanArmorShape.CHEST.getSlotIndex()];
         if (chestSlot != null && chestSlot.getItem() instanceof ItemBackpack) {
             return chestSlot;
         }

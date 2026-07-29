@@ -7,6 +7,7 @@ import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
+import net.minecraft.core.world.pos.TilePosc;
 
 public class ItemBedroll extends Item {
 
@@ -16,14 +17,17 @@ public class ItemBedroll extends Item {
     }
 
     @Override
-    public boolean onUseItemOnBlock(ItemStack itemstack, Player player, World world, int blockX, int blockY, int blockZ, Side side, double xPlaced, double yPlaced) {
+    public boolean onUseOnBlock(ItemStack itemstack, World world, Player player, TilePosc pos, Side side, double xPlaced, double yPlaced) {
+        int blockX = pos.x();
+        int blockY = pos.y();
+        int blockZ = pos.z();
         if (!world.canPlaceInsideBlock(blockX, blockY, blockZ)) {
-            blockX += side.getOffsetX();
-            blockY += side.getOffsetY();
-            blockZ += side.getOffsetZ();
+            blockX += side.offsetX();
+            blockY += side.offsetY();
+            blockZ += side.offsetZ();
         }
 
-        int direction = player.getHorizontalPlacementDirection(null).getOpposite().getHorizontalIndex();
+        int direction = player.getHorizontalPlacementDirection(null).opposite().legacyIndex();
 
         int offsetX = 0;
         int offsetZ = 0;
@@ -34,8 +38,8 @@ public class ItemBedroll extends Item {
 
         if (world.isAirBlock(blockX, blockY, blockZ)
             && world.isAirBlock(blockX + offsetX, blockY, blockZ + offsetZ)
-            && world.canPlaceOnSurfaceOfBlock(blockX, blockY - 1, blockZ)
-            && world.canPlaceOnSurfaceOfBlock(blockX + offsetX, blockY - 1, blockZ + offsetZ)
+            && world.canBlockBePlacedAt(BackpackBlocks.BEDROLL_BLOCK.id(), blockX, blockY, blockZ, false, Side.TOP)
+            && world.canBlockBePlacedAt(BackpackBlocks.BEDROLL_BLOCK.id(), blockX + offsetX, blockY, blockZ + offsetZ, false, Side.TOP)
             && itemstack.consumeItem(player)) {
 
             world.playBlockSoundEffect(player, (float) blockX + 0.5f, (float) blockY + 0.5f, (float) blockZ + 0.5f,

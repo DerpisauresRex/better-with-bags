@@ -6,7 +6,7 @@ import com.sajmonoriginal.betterwithbags.item.ItemBackpack;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.entity.TileEntity;
-import net.minecraft.core.block.material.Material;
+import net.minecraft.core.block.material.Materials;
 import net.minecraft.core.entity.Mob;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.enums.EnumDropCause;
@@ -14,13 +14,15 @@ import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
+import net.minecraft.core.world.pos.TilePos;
+import net.minecraft.core.world.pos.TilePosc;
 
 public class BlockLogicBackpack extends BlockLogic {
 
     private final BackpackTier tier;
 
     public BlockLogicBackpack(Block<?> block, BackpackTier tier) {
-        super(block, Material.cloth);
+        super(block, Materials.CLOTH);
         this.tier = tier;
         setBlockBounds(0.1875, 0.0, 0.1875, 0.8125, 0.625, 0.8125);
     }
@@ -46,8 +48,8 @@ public class BlockLogicBackpack extends BlockLogic {
 
     @Override
     public void onBlockPlacedByMob(World world, int x, int y, int z, Side side, Mob mob, double xOffset, double yOffset) {
-        Direction dir = mob.getHorizontalPlacementDirection(side).getOpposite();
-        world.setBlockMetadataWithNotify(x, y, z, dir.getId());
+        Direction dir = mob.getHorizontalPlacementDirection(side).opposite();
+        world.setBlockMetadataWithNotify(x, y, z, dir.id);
     }
 
     @Override
@@ -55,13 +57,13 @@ public class BlockLogicBackpack extends BlockLogic {
         if (!side.isHorizontal()) {
             side = Side.SOUTH;
         }
-        Direction dir = side.getDirection();
-        world.setBlockMetadataWithNotify(x, y, z, dir.getId());
+        Direction dir = side.direction();
+        world.setBlockMetadataWithNotify(x, y, z, dir.id);
     }
 
     @Override
-    public boolean onBlockRightClicked(World world, int x, int y, int z, Player player, Side side, double xOffset, double yOffset) {
-        TileEntity te = world.getTileEntity(x, y, z);
+    public boolean onInteracted(World world, TilePosc pos, Player player, Side side, double hitX, double hitY) {
+        TileEntity te = world.getTileEntity(pos);
         if (!(te instanceof TileEntityBackpack)) {
             return false;
         }
@@ -70,7 +72,8 @@ public class BlockLogicBackpack extends BlockLogic {
 
         if (player.isSneaking()) {
             if (!world.isClientSide) {
-                pickUpBackpack(world, x, y, z, player, backpackTE);
+                TilePos tilePos = new TilePos(pos);
+                pickUpBackpack(world, tilePos.x, tilePos.y, tilePos.z, player, backpackTE);
             }
             return true;
         }
