@@ -5,12 +5,12 @@ import com.sajmonoriginal.betterwithbags.block.TileEntityBackpack;
 import com.sajmonoriginal.betterwithbags.block.TileEntityBedroll;
 import com.sajmonoriginal.betterwithbags.item.BackpackItems;
 import com.sajmonoriginal.betterwithbags.item.BackpackTier;
+import com.sajmonoriginal.betterwithbags.model.BlockModelBag;
 import com.sajmonoriginal.betterwithbags.model.ItemModelBackpack;
 import com.sajmonoriginal.betterwithbags.model.ItemModelPlacedBackpack;
 import com.sajmonoriginal.betterwithbags.model.ItemModelPlacedBedroll;
 import com.sajmonoriginal.betterwithbags.render.TileEntityRendererBackpack;
 import com.sajmonoriginal.betterwithbags.render.TileEntityRendererBedroll;
-import org.useless.dragonfly.data.entity.mojang.EntityGeometryMojangData;
 import net.minecraft.client.render.EntityRendererDispatcher;
 import net.minecraft.client.render.TileEntityRenderDispatcher;
 import net.minecraft.client.render.block.color.BlockColorDispatcher;
@@ -18,6 +18,7 @@ import net.minecraft.client.render.block.model.BlockModelDispatcher;
 import net.minecraft.client.render.item.model.ItemModelDispatcher;
 import net.minecraft.client.render.item.model.ItemModelStandard;
 import net.minecraft.core.block.Block;
+import org.useless.dragonfly.data.entity.mojang.EntityGeometryMojangData;
 import turniplabs.halplibe.util.ModelEntrypoint;
 
 import java.io.InputStream;
@@ -45,6 +46,12 @@ public class BackpackModels implements ModelEntrypoint {
 
     @Override
     public void initBlockModels(BlockModelDispatcher dispatcher) {
+        dispatcher.addDispatch(BackpackBlocks.BACKPACK_BLOCK_SMALL, new BlockModelBag<>(BackpackBlocks.BACKPACK_BLOCK_SMALL));
+        dispatcher.addDispatch(BackpackBlocks.BACKPACK_BLOCK_MEDIUM, new BlockModelBag<>(BackpackBlocks.BACKPACK_BLOCK_MEDIUM));
+        dispatcher.addDispatch(BackpackBlocks.BACKPACK_BLOCK_LARGE, new BlockModelBag<>(BackpackBlocks.BACKPACK_BLOCK_LARGE));
+        dispatcher.addDispatch(BackpackBlocks.BACKPACK_BLOCK_REINFORCED, new BlockModelBag<>(BackpackBlocks.BACKPACK_BLOCK_REINFORCED));
+        dispatcher.addDispatch(BackpackBlocks.BACKPACK_BLOCK_NETHER, new BlockModelBag<>(BackpackBlocks.BACKPACK_BLOCK_NETHER));
+        dispatcher.addDispatch(BackpackBlocks.BEDROLL_BLOCK, new BlockModelBag<>(BackpackBlocks.BEDROLL_BLOCK));
     }
 
     @Override
