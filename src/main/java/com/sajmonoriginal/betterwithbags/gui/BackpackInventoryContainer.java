@@ -9,13 +9,14 @@ import net.minecraft.core.player.inventory.container.ContainerInventory;
 public class BackpackInventoryContainer implements Container {
     private final ContainerInventory playerInventory;
     private final int slotIndex;
+    private final ItemStack backpackStack;
     private final int capacity;
     private final ItemStack[] contents;
 
-    public BackpackInventoryContainer(ContainerInventory playerInventory, int slotIndex) {
+    public BackpackInventoryContainer(ContainerInventory playerInventory, int slotIndex, ItemStack backpackStack) {
         this.playerInventory = playerInventory;
         this.slotIndex = slotIndex;
-        ItemStack backpackStack = playerInventory.mainInventory[slotIndex];
+        this.backpackStack = backpackStack;
         ItemBackpack backpack = (ItemBackpack) backpackStack.getItem();
         this.capacity = backpack.getCapacity();
 
@@ -24,7 +25,7 @@ public class BackpackInventoryContainer implements Container {
     }
 
     private ItemStack getBackpackStack() {
-        return playerInventory.mainInventory[slotIndex];
+        return backpackStack;
     }
 
     @Override
@@ -95,7 +96,11 @@ public class BackpackInventoryContainer implements Container {
 
     @Override
     public boolean stillValid(Player player) {
-        return true;
+        if (player.world != null && player.world.isClientSide) {
+            ItemStack current = playerInventory.mainInventory[slotIndex];
+            return current != null && current.getItem() == backpackStack.getItem();
+        }
+        return playerInventory.mainInventory[slotIndex] == backpackStack;
     }
 
     @Override

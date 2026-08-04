@@ -20,15 +20,17 @@ public class ContainerBackpack extends MenuAbstract {
     private final BackpackInventoryContainer backpackContainer;
     private final ContainerInventory playerInventory;
     private final int heldSlotIndex;
+    private final ItemStack backpackStack;
 
     public ContainerBackpack(ContainerInventory playerInventory, ItemStack backpackStack) {
         this.playerInventory = playerInventory;
         this.heldSlotIndex = playerInventory.getCurrentSlot();
+        this.backpackStack = backpackStack;
         ItemBackpack backpack = (ItemBackpack) backpackStack.getItem();
         this.tier = backpack.getTier();
         this.rows = tier.getRows();
         this.capacity = tier.getSlots();
-        this.backpackContainer = new BackpackInventoryContainer(playerInventory, heldSlotIndex);
+        this.backpackContainer = new BackpackInventoryContainer(playerInventory, heldSlotIndex, backpackStack);
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < 9; col++) {
@@ -43,7 +45,7 @@ public class ContainerBackpack extends MenuAbstract {
                                       tier == BackpackTier.REINFORCED ||
                                       tier == BackpackTier.NETHER;
         if (supportsAttachment) {
-            this.addSlot(new SlotAttachment(playerInventory, heldSlotIndex, 178, 18));
+            this.addSlot(new SlotAttachment(backpackStack, 178, 18));
         }
 
         int playerInvY = 17 + rows * 18 + 22;
@@ -147,6 +149,10 @@ public class ContainerBackpack extends MenuAbstract {
 
     private boolean isBackpackInSlot() {
         ItemStack current = playerInventory.mainInventory[heldSlotIndex];
-        return current != null && current.getItem() instanceof ItemBackpack;
+        if (playerInventory.player.world != null && playerInventory.player.world.isClientSide) {
+            return current != null && current.getItem() instanceof ItemBackpack &&
+                ((ItemBackpack) current.getItem()).getTier() == this.tier;
+        }
+        return current == backpackStack;
     }
 }

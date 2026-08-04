@@ -3,21 +3,18 @@ package com.sajmonoriginal.betterwithbags.gui;
 import com.sajmonoriginal.betterwithbags.item.ItemBackpack;
 import com.sajmonoriginal.betterwithbags.item.ItemBedroll;
 import net.minecraft.core.item.ItemStack;
-import net.minecraft.core.player.inventory.container.ContainerInventory;
 import net.minecraft.core.player.inventory.slot.Slot;
 
 public class SlotAttachment extends Slot {
-    private final ContainerInventory playerInventory;
-    private final int slotIndex;
+    private final ItemStack backpackStack;
 
-    public SlotAttachment(ContainerInventory playerInventory, int slotIndex, int x, int y) {
+    public SlotAttachment(ItemStack backpackStack, int x, int y) {
         super(null, 0, x, y);
-        this.playerInventory = playerInventory;
-        this.slotIndex = slotIndex;
+        this.backpackStack = backpackStack;
     }
 
     private ItemStack getBackpackStack() {
-        return playerInventory.mainInventory[slotIndex];
+        return backpackStack;
     }
 
     @Override
