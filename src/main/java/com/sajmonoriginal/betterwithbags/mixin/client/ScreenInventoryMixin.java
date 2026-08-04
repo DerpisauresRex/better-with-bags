@@ -1,6 +1,7 @@
 package com.sajmonoriginal.betterwithbags.mixin.client;
 
 import com.sajmonoriginal.betterwithbags.BetterWithBagsMod;
+import com.sajmonoriginal.betterwithbags.gui.ResponsiveBackpackScreen;
 import com.sajmonoriginal.betterwithbags.item.BackpackTier;
 import com.sajmonoriginal.betterwithbags.item.ItemBackpack;
 import com.sajmonoriginal.betterwithbags.util.BackpackMenuCapable;
@@ -8,6 +9,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.container.ScreenContainerAbstract;
 import net.minecraft.client.gui.container.ScreenInventory;
+import net.minecraft.client.gui.container.ScreenInventoryCreative;
 import net.minecraft.client.render.renderer.GLRenderer;
 import net.minecraft.client.render.renderer.State;
 import net.minecraft.core.player.inventory.menu.MenuAbstract;
@@ -20,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Environment(EnvType.CLIENT)
 @Mixin(value = ScreenInventory.class, remap = false)
-public abstract class ScreenInventoryMixin extends ScreenContainerAbstract {
+public abstract class ScreenInventoryMixin extends ScreenContainerAbstract implements ResponsiveBackpackScreen {
 
     @Unique
     private static final String EXTENSION_TEXTURE_BASE = "/assets/" + BetterWithBagsMod.MOD_ID + "/textures/gui/backpack_extension_";
@@ -36,6 +38,10 @@ public abstract class ScreenInventoryMixin extends ScreenContainerAbstract {
     private static final int EXTENSION_TITLE_HEIGHT = 14;
     @Unique
     private static final int EXTENSION_BOTTOM_HEIGHT = 7;
+    @Unique
+    private static final int SCREEN_MARGIN = 8;
+    @Unique
+    private static final int ATTACHMENT_PANEL_WIDTH = 210;
 
     @Unique
     private int bwb$backpackRows = 0;
@@ -45,6 +51,8 @@ public abstract class ScreenInventoryMixin extends ScreenContainerAbstract {
     private BackpackTier bwb$lastTier = null;
     @Unique
     private BackpackTier bwb$currentTier = null;
+    @Unique
+    private boolean bwb$renderingResponsive = false;
 
     protected ScreenInventoryMixin(MenuAbstract menu) {
         super(menu);
@@ -94,6 +102,98 @@ public abstract class ScreenInventoryMixin extends ScreenContainerAbstract {
             this.bwb$lastTier = tierNow;
             bwb$refreshBackpack();
         }
+    }
+
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    private void bwb$renderResponsive(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
+        if ((Object) this instanceof ScreenInventoryCreative ||
+            this.bwb$renderingResponsive || !betterWithBags$hasResponsiveLayout()) {
+            return;
+        }
+
+        this.renderBackground();
+        GLRenderer.pushFrame();
+        float scale = bwb$getGuiScale();
+        GLRenderer.modelM4f()
+            .translate(this.width / 2, this.height / 2, 0.0F)
+            .scale(scale, scale, 1.0F)
+            .translate(-bwb$getContentCenterX(), -bwb$getContentCenterY(), 0.0F);
+        this.bwb$renderingResponsive = true;
+        try {
+            ((ScreenInventory) (Object) this).render(
+                betterWithBags$transformMouseX(mouseX),
+                betterWithBags$transformMouseY(mouseY),
+                partialTicks);
+        } finally {
+            this.bwb$renderingResponsive = false;
+            GLRenderer.popFrame();
+        }
+        ci.cancel();
+    }
+
+    @Unique
+    private int bwb$getContentWidth() {
+        if ((Object) this instanceof ScreenInventoryCreative) {
+            return this.xSize;
+        }
+        return this.bwb$currentTier == BackpackTier.LARGE ||
+            this.bwb$currentTier == BackpackTier.REINFORCED ||
+            this.bwb$currentTier == BackpackTier.NETHER ? ATTACHMENT_PANEL_WIDTH : EXTENSION_WIDTH;
+    }
+
+    @Unique
+    private int bwb$getContentHeight() {
+        return STANDARD_HEIGHT + EXTENSION_TITLE_HEIGHT + this.bwb$backpackRows * ROW_HEIGHT + EXTENSION_BOTTOM_HEIGHT;
+    }
+
+    @Unique
+    private int bwb$getContentCenterX() {
+        int guiLeft = (this.width - this.xSize) / 2;
+        return guiLeft + bwb$getContentWidth() / 2;
+    }
+
+    @Unique
+    private int bwb$getContentCenterY() {
+        int guiTop = (this.height - this.ySize) / 2;
+        return guiTop + bwb$getContentHeight() / 2;
+    }
+
+    @Unique
+    private boolean bwb$contentOverflowsCurrentPosition() {
+        int guiLeft = (this.width - this.xSize) / 2;
+        int guiTop = (this.height - this.ySize) / 2;
+        return guiLeft < SCREEN_MARGIN ||
+            guiLeft + bwb$getContentWidth() > this.width - SCREEN_MARGIN ||
+            guiTop < SCREEN_MARGIN ||
+            guiTop + bwb$getContentHeight() > this.height - SCREEN_MARGIN;
+    }
+
+    @Unique
+    private float bwb$getGuiScale() {
+        float horizontalScale = (this.width - SCREEN_MARGIN * 2) / (float) bwb$getContentWidth();
+        float verticalScale = (this.height - SCREEN_MARGIN * 2) / (float) bwb$getContentHeight();
+        return Math.min(1.0F, Math.min(horizontalScale, verticalScale));
+    }
+
+    @Override
+    public boolean betterWithBags$hasResponsiveLayout() {
+        return this.bwb$backpackRows > 0 && this.bwb$currentTier != null &&
+            bwb$contentOverflowsCurrentPosition();
+    }
+
+    @Override
+    public boolean betterWithBags$isRenderingResponsive() {
+        return this.bwb$renderingResponsive;
+    }
+
+    @Override
+    public int betterWithBags$transformMouseX(int mouseX) {
+        return Math.round(bwb$getContentCenterX() + (mouseX - this.width / 2) / bwb$getGuiScale());
+    }
+
+    @Override
+    public int betterWithBags$transformMouseY(int mouseY) {
+        return Math.round(bwb$getContentCenterY() + (mouseY - this.height / 2) / bwb$getGuiScale());
     }
 
     @Inject(method = "drawGuiContainerBackgroundLayer", at = @At("HEAD"))

@@ -5,13 +5,12 @@ import com.sajmonoriginal.betterwithbags.block.TileEntityBackpack;
 import com.sajmonoriginal.betterwithbags.item.BackpackTier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.container.ScreenContainerAbstract;
 import net.minecraft.client.render.renderer.GLRenderer;
 import net.minecraft.client.render.renderer.State;
 import net.minecraft.core.player.inventory.container.ContainerInventory;
 
 @Environment(EnvType.CLIENT)
-public class ScreenBackpackBlock extends ScreenContainerAbstract {
+public class ScreenBackpackBlock extends ScreenBackpackResponsive {
     private static final String GUI_TEXTURE_BASE = "/assets/" + BetterWithBagsMod.MOD_ID + "/textures/gui/backpack_";
 
     private final ContainerBackpackBlock container;
@@ -24,7 +23,7 @@ public class ScreenBackpackBlock extends ScreenContainerAbstract {
         this.rows = container.getRows();
         BackpackTier tier = container.getTier();
         boolean hasAttachmentSlot = tier == BackpackTier.LARGE || tier == BackpackTier.REINFORCED || tier == BackpackTier.NETHER;
-        this.xSize = hasAttachmentSlot ? 194 : 176;
+        this.xSize = hasAttachmentSlot ? 199 : 176;
         this.ySize = 121 + rows * 18;
         this.guiTexture = GUI_TEXTURE_BASE + tier.getName() + ".png";
     }

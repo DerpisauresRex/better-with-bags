@@ -17,13 +17,15 @@
 	],
 	"client": [
 		"client.EntityGeometryMojangDataCacheMixin",
+		"client.HudComponentArmorBarMixin",
 		"client.MobRendererPlayerMixin",
 		"client.MobRendererPlayerArmorMixin",
 		"client.PacketHandlerClientMixinBackpack",
 		"client.PlayerLocalMixinBagScreens",
 		"client.ScreenContainerAbstractMixin",
 		"client.ScreenInventoryMixin",
-		"client.ScreenInventoryCreativeMixin"
+		"client.ScreenInventoryCreativeMixin",
+		"client.ScreenMixinResponsiveBackground"
 	],
 	"server": [
 		"server.PlayerServerMixinBagScreens"

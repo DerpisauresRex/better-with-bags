@@ -117,6 +117,6 @@ public class BlockLogicBackpack extends BlockLogic {
         if (tileEntity instanceof TileEntityBackpack) {
             return new ItemStack[]{createItemFromTileEntity((TileEntityBackpack) tileEntity)};
         }
-        return new ItemStack[]{new ItemStack(BackpackItems.getItemForTier(this.tier))};
+        return new ItemStack[]{BackpackItems.getItemForTier(this.tier).getDefaultStack()};
     }
 }

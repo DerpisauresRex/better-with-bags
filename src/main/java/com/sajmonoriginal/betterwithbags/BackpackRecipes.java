@@ -1,6 +1,7 @@
 package com.sajmonoriginal.betterwithbags;
 
 import com.sajmonoriginal.betterwithbags.item.BackpackItems;
+import com.sajmonoriginal.betterwithbags.item.ItemBackpack;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.item.Items;
@@ -17,35 +18,35 @@ public class BackpackRecipes implements RecipeEntrypoint {
             .addInput('L', Items.LEATHER)
             .addInput('C', Items.CLOTH)
             .addInput('S', Items.STRING)
-            .create("backpack_small", new ItemStack(BackpackItems.BACKPACK_SMALL, 1));
+            .create("backpack_small", ((ItemBackpack) BackpackItems.BACKPACK_SMALL).getDefaultStack());
 
         RecipeBuilder.Shaped(modId, "CIC", "LBL", "CIC")
             .addInput('L', Items.LEATHER)
             .addInput('C', Items.CLOTH)
             .addInput('I', Items.INGOT_IRON)
-            .addInput('B', BackpackItems.BACKPACK_SMALL)
-            .create("backpack_medium", new ItemStack(BackpackItems.BACKPACK_MEDIUM, 1));
+            .addInput('B', ((ItemBackpack) BackpackItems.BACKPACK_SMALL).getDefaultStack())
+            .create("backpack_medium", ((ItemBackpack) BackpackItems.BACKPACK_MEDIUM).getDefaultStack());
 
         RecipeBuilder.Shaped(modId, "CGC", "LBL", "CGC")
             .addInput('L', Items.LEATHER)
             .addInput('C', Items.CLOTH)
             .addInput('G', Items.INGOT_GOLD)
-            .addInput('B', BackpackItems.BACKPACK_MEDIUM)
-            .create("backpack_large", new ItemStack(BackpackItems.BACKPACK_LARGE, 1));
+            .addInput('B', ((ItemBackpack) BackpackItems.BACKPACK_MEDIUM).getDefaultStack())
+            .create("backpack_large", ((ItemBackpack) BackpackItems.BACKPACK_LARGE).getDefaultStack());
 
         RecipeBuilder.Shaped(modId, "DCD", "MBM", "DCD")
             .addInput('D', Items.DIAMOND)
             .addInput('C', Items.CLOTH)
             .addInput('M', Blocks.MESH)
-            .addInput('B', BackpackItems.BACKPACK_LARGE)
-            .create("backpack_reinforced", new ItemStack(BackpackItems.BACKPACK_REINFORCED, 1));
+            .addInput('B', ((ItemBackpack) BackpackItems.BACKPACK_LARGE).getDefaultStack())
+            .create("backpack_reinforced", ((ItemBackpack) BackpackItems.BACKPACK_REINFORCED).getDefaultStack());
 
         RecipeBuilder.Shaped(modId, "OCO", "MBM", "OCO")
             .addInput('O', Items.OLIVINE)
             .addInput('C', Items.NETHERCOAL)
             .addInput('M', Blocks.MESH_GOLD)
-            .addInput('B', BackpackItems.BACKPACK_REINFORCED)
-            .create("backpack_nether", new ItemStack(BackpackItems.BACKPACK_NETHER, 1));
+            .addInput('B', ((ItemBackpack) BackpackItems.BACKPACK_REINFORCED).getDefaultStack())
+            .create("backpack_nether", ((ItemBackpack) BackpackItems.BACKPACK_NETHER).getDefaultStack());
 
         RecipeBuilder.Shaped(modId, "LWL", "LWL", "LLL")
             .addInput('L', Items.LEATHER)

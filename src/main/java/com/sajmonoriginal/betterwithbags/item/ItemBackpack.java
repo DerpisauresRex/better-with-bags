@@ -24,6 +24,7 @@ public class ItemBackpack extends Item implements IArmorItem {
         super(name, textureKey, id);
         this.tier = tier;
         this.maxStackSize = 1;
+        this.setMaxDamage(tier.getSlots() + 1);
     }
 
     public BackpackTier getTier() {
@@ -36,6 +37,16 @@ public class ItemBackpack extends Item implements IArmorItem {
 
     public int getRows() {
         return tier.getRows();
+    }
+
+    @Override
+    public ItemStack getDefaultStack() {
+        return new ItemStack(this, 1, this.tier.getSlots());
+    }
+
+    @Override
+    public boolean showFullDurability() {
+        return true;
     }
 
     @Override
@@ -97,7 +108,7 @@ public class ItemBackpack extends Item implements IArmorItem {
 
     @Override
     public ArmorMaterial getArmorMaterial() {
-        return BackpackArmorMaterial.BACKPACK;
+        return null;
     }
 
     @Override
@@ -157,6 +168,8 @@ public class ItemBackpack extends Item implements IArmorItem {
             }
         }
 
+        syncFillLevel(backpackStack, contents);
+
         return contents;
     }
 
@@ -178,6 +191,7 @@ public class ItemBackpack extends Item implements IArmorItem {
         }
 
         tag.put("BackpackInventory", itemList);
+        syncFillLevel(backpackStack, contents);
     }
 
     public static void setBackpackSlot(ItemStack backpackStack, int slot, ItemStack item) {
@@ -208,6 +222,19 @@ public class ItemBackpack extends Item implements IArmorItem {
         return 0;
     }
 
+    private static void syncFillLevel(ItemStack backpackStack, ItemStack[] contents) {
+        int occupiedSlots = 0;
+        for (ItemStack content : contents) {
+            if (content != null) {
+                occupiedSlots++;
+            }
+        }
+
+        ItemBackpack backpack = (ItemBackpack) backpackStack.getItem();
+        int attachmentSlots = backpackStack.getData().containsKey("Attachment") ? 1 : 0;
+        backpackStack.setMetadata(Math.max(0, backpack.getCapacity() - occupiedSlots - attachmentSlots));
+    }
+
     public static ItemStack getAttachment(ItemStack backpackStack) {
         if (backpackStack == null || !(backpackStack.getItem() instanceof ItemBackpack)) {
             return null;
@@ -231,6 +258,7 @@ public class ItemBackpack extends Item implements IArmorItem {
         } else {
             tag.getValue().remove("Attachment");
         }
+        getBackpackContents(backpackStack);
     }
 
     public static boolean hasAttachment(ItemStack backpackStack) {
