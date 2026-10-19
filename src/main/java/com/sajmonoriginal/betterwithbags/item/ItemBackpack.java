@@ -17,6 +17,9 @@ import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.pos.TilePosc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ItemBackpack extends Item implements IArmorItem {
 
     private final BackpackTier tier;
@@ -38,11 +41,6 @@ public class ItemBackpack extends Item implements IArmorItem {
 
     public int getRows() {
         return tier.getRows();
-    }
-
-    @Override
-    public ItemStack getDefaultStack() {
-        return new ItemStack(this, 1, this.tier.getSlots());
     }
 
     @Override
@@ -101,6 +99,7 @@ public class ItemBackpack extends Item implements IArmorItem {
             if (attachment != null) {
                 backpackTE.setAttachment(attachment);
             }
+            backpackTE.setCustomName(itemstack.getCustomName());
         }
 
         itemstack.stackSize--;
@@ -177,8 +176,6 @@ public class ItemBackpack extends Item implements IArmorItem {
             }
         }
 
-        syncFillLevel(backpackStack, contents);
-
         return contents;
     }
 
@@ -200,7 +197,7 @@ public class ItemBackpack extends Item implements IArmorItem {
         }
 
         tag.put("BackpackInventory", itemList);
-        syncFillLevel(backpackStack, contents);
+        backpackStack.setMetadata(0);
     }
 
     public static void setBackpackSlot(ItemStack backpackStack, int slot, ItemStack item) {
@@ -220,6 +217,31 @@ public class ItemBackpack extends Item implements IArmorItem {
         return false;
     }
 
+    public static void transferContents(ItemStack from, ItemStack to) {
+        to.setData(from.getData());
+        ItemStack[] source = getBackpackContents(from);
+        if (source == null || !(to.getItem() instanceof ItemBackpack)) {
+            return;
+        }
+
+        ItemStack[] contents = new ItemStack[((ItemBackpack) to.getItem()).getCapacity()];
+        List<ItemStack> overflow = new ArrayList<>();
+        for (int i = 0; i < source.length; i++) {
+            if (source[i] == null) continue;
+            if (i < contents.length) {
+                contents[i] = source[i];
+            } else {
+                overflow.add(source[i]);
+            }
+        }
+        for (int i = 0; i < contents.length && !overflow.isEmpty(); i++) {
+            if (contents[i] == null) {
+                contents[i] = overflow.remove(0);
+            }
+        }
+        setBackpackContents(to, contents);
+    }
+
     public static int getOccupiedSlotCount(ItemStack backpackStack) {
         if (backpackStack == null || !(backpackStack.getItem() instanceof ItemBackpack)) {
             return 0;
@@ -231,17 +253,10 @@ public class ItemBackpack extends Item implements IArmorItem {
         return 0;
     }
 
-    private static void syncFillLevel(ItemStack backpackStack, ItemStack[] contents) {
-        int occupiedSlots = 0;
-        for (ItemStack content : contents) {
-            if (content != null) {
-                occupiedSlots++;
-            }
-        }
-
+    public static int getFreeSlotCount(ItemStack backpackStack) {
         ItemBackpack backpack = (ItemBackpack) backpackStack.getItem();
         int attachmentSlots = backpackStack.getData().containsKey("Attachment") ? 1 : 0;
-        backpackStack.setMetadata(Math.max(0, backpack.getCapacity() - occupiedSlots - attachmentSlots));
+        return Math.max(0, backpack.getCapacity() - getOccupiedSlotCount(backpackStack) - attachmentSlots);
     }
 
     public static ItemStack getAttachment(ItemStack backpackStack) {
@@ -267,7 +282,7 @@ public class ItemBackpack extends Item implements IArmorItem {
         } else {
             tag.getValue().remove("Attachment");
         }
-        getBackpackContents(backpackStack);
+        backpackStack.setMetadata(0);
     }
 
     public static boolean hasAttachment(ItemStack backpackStack) {
