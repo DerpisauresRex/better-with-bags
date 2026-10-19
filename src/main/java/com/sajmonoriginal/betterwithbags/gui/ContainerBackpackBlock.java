@@ -33,10 +33,7 @@ public class ContainerBackpackBlock extends MenuAbstract {
             }
         }
 
-        boolean supportsAttachment = tier == BackpackTier.LARGE ||
-                                      tier == BackpackTier.REINFORCED ||
-                                      tier == BackpackTier.NETHER;
-        if (supportsAttachment) {
+        if (tier.supportsAttachment()) {
             this.addSlot(new SlotAttachmentBlock(tileEntity, 178, 18));
         }
 
@@ -61,10 +58,18 @@ public class ContainerBackpackBlock extends MenuAbstract {
         return tier;
     }
 
+    private int getAttachmentSlot() {
+        return tier.supportsAttachment() ? capacity : -1;
+    }
+
+    private int getPlayerSlotStart() {
+        return tier.supportsAttachment() ? capacity + 1 : capacity;
+    }
+
     @Override
     public IntList getMoveSlots(InventoryAction action, Slot slot, int target, Player player) {
-        int attachmentSlot = capacity;
-        int playerStart = capacity + 1;
+        int attachmentSlot = getAttachmentSlot();
+        int playerStart = getPlayerSlotStart();
         if (slot.index < capacity) {
             return this.getSlots(slot.index, 1, false);
         }
@@ -84,8 +89,8 @@ public class ContainerBackpackBlock extends MenuAbstract {
 
     @Override
     public IntList getTargetSlots(InventoryAction action, Slot slot, int target, Player player) {
-        int attachmentSlot = capacity;
-        int playerStart = capacity + 1;
+        int attachmentSlot = getAttachmentSlot();
+        int playerStart = getPlayerSlotStart();
         if (slot.index < capacity) {
             return this.getSlots(playerStart, 36, false);
         }
@@ -94,7 +99,7 @@ public class ContainerBackpackBlock extends MenuAbstract {
         }
         if (slot.index >= playerStart) {
             ItemStack stack = slot.getItemStack();
-            if (stack != null && stack.getItem() instanceof ItemBackpack) {
+            if (ItemBackpack.isBackpack(stack)) {
                 return IntLists.EMPTY_LIST;
             }
             if (stack != null && stack.getItem() instanceof com.sajmonoriginal.betterwithbags.item.ItemBedroll) {

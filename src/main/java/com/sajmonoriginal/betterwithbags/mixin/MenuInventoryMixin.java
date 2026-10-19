@@ -1,5 +1,6 @@
 package com.sajmonoriginal.betterwithbags.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.sajmonoriginal.betterwithbags.gui.WornBackpackContainer;
 import com.sajmonoriginal.betterwithbags.item.BackpackTier;
 import com.sajmonoriginal.betterwithbags.item.ItemBackpack;
@@ -10,7 +11,6 @@ import com.sajmonoriginal.betterwithbags.util.BackpackMenuCapable;
 import net.minecraft.core.InventoryAction;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.enums.HumanArmorShape;
-import net.minecraft.core.item.IArmorItem;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.player.inventory.container.ContainerInventory;
@@ -22,7 +22,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -43,6 +42,8 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
     private static final int EXTENSION_TITLE_HEIGHT = 14;
     @Unique
     private static final int HIDDEN_Y = -9999;
+    @Unique
+    private static final int HOTBAR_SLOTS_START = 36;
 
     @Unique
     private boolean bwb$hasBackpackSlots = false;
@@ -75,6 +76,10 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
     @Override
     public int betterWithBags$getBackpackRows() {
         return this.bwb$backpackRows;
+    }
+
+    public int getHotbarSlotId(int number) {
+        return HOTBAR_SLOTS_START + number - 1;
     }
 
     @Inject(method = "<init>(Lnet/minecraft/core/player/inventory/container/ContainerInventory;)V",
@@ -166,36 +171,28 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
         }
     }
 
-    @Inject(method = "getTargetSlots", at = @At("HEAD"), cancellable = true)
-    private void bwb$addBackpackTargets(InventoryAction action, Slot slot, int button, Player player,
-                                         CallbackInfoReturnable<IntList> cir) {
-        if (!bwb$hasBackpackSlots || bwb$backpackSlotStartIndex < 0) return;
+    @ModifyReturnValue(method = "getTargetSlots", at = @At("RETURN"))
+    private IntList bwb$addBackpackTargets(IntList original, InventoryAction action, Slot slot, int target, Player player) {
+        betterWithBags$refreshBackpackSlots();
+        if (original == null || !bwb$hasBackpackSlots || bwb$backpackSlotStartIndex < 0) {
+            return original;
+        }
+        if (slot.index < 9 || slot.index > 44) {
+            return original;
+        }
+        for (int i = 0; i < original.size(); i++) {
+            int index = original.getInt(i);
+            if (index < 9 || index > 44) {
+                return original;
+            }
+        }
 
+        IntList targets = new IntArrayList();
         int capacity = bwb$backpackRows * 9;
-        int slotIndex = slot.index;
-        MenuInventory self = (MenuInventory) (Object) this;
-
-        if (slotIndex >= 9 && slotIndex <= 44 && button != 1) {
-            if (button == 2 && slot.getItemStack() != null
-                && slot.getItemStack().getItem() instanceof IArmorItem) {
-                return;
-            }
-            IntList targets = new IntArrayList();
-            for (int i = 0; i < capacity; i++) {
-                targets.add(bwb$backpackSlotStartIndex + i);
-            }
-            if (slotIndex < 36) {
-                targets.addAll(self.getSlots(36, 9, false));
-            } else {
-                targets.addAll(self.getSlots(9, 27, false));
-            }
-            cir.setReturnValue(targets);
-            return;
+        for (int i = 0; i < capacity; i++) {
+            targets.add(bwb$backpackSlotStartIndex + i);
         }
-
-        if (slotIndex >= bwb$backpackSlotStartIndex
-            && slotIndex < bwb$backpackSlotStartIndex + capacity) {
-            cir.setReturnValue(self.getSlots(9, 36, false));
-        }
+        targets.addAll(original);
+        return targets;
     }
 }

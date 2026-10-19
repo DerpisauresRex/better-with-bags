@@ -6,8 +6,10 @@
 		"defaultRequire": 1
 	},
 	"mixins": [
+		"ContainerInventoryMixin",
 		"EntityItemMixin",
 		"InventoryPlayerMixin",
+		"MenuAbstractMixin",
 		"MenuInventoryMixin",
 		"PlayerMixin",
 		"PlayerMixinBagScreens",

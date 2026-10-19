@@ -11,6 +11,8 @@ import net.minecraft.core.net.packet.PacketTileEntityData;
 import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.world.World;
 
+import java.util.Arrays;
+
 public class TileEntityBackpack extends TileEntity implements Container {
 
     private ItemStack[] contents;
@@ -47,6 +49,11 @@ public class TileEntityBackpack extends TileEntity implements Container {
 
     public boolean hasAttachment() {
         return attachment != null;
+    }
+
+    public void clearContents() {
+        Arrays.fill(contents, null);
+        attachment = null;
     }
 
     @Override
@@ -105,7 +112,7 @@ public class TileEntityBackpack extends TileEntity implements Container {
         if (worldObj.getTileEntity(tilePos) != this) {
             return false;
         }
-        return player.distanceTo(tilePos.x + 0.5, tilePos.y + 0.5, tilePos.z + 0.5) <= 64.0;
+        return player.distanceToSqr(tilePos.x + 0.5, tilePos.y + 0.5, tilePos.z + 0.5) <= 64.0;
     }
 
     @Override
@@ -171,7 +178,12 @@ public class TileEntityBackpack extends TileEntity implements Container {
 
     @Override
     public Packet getDescriptionPacket() {
-        return new PacketTileEntityData(this);
+        CompoundTag tag = new CompoundTag();
+        writeToNBT(tag);
+        tag.getValue().remove("BackpackInventory");
+        PacketTileEntityData packet = new PacketTileEntityData(tag);
+        packet.isChunkDataPacket = true;
+        return packet;
     }
 
 }
