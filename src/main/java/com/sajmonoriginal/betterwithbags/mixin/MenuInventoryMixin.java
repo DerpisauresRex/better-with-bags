@@ -1,7 +1,8 @@
 package com.sajmonoriginal.betterwithbags.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.sajmonoriginal.betterwithbags.gui.WornBackpackContainer;
+import com.sajmonoriginal.betterwithbags.gui.BackpackPanelLayout;
+import com.sajmonoriginal.betterwithbags.gui.ContainerWornBackpack;
 import com.sajmonoriginal.betterwithbags.item.BackpackTier;
 import com.sajmonoriginal.betterwithbags.item.ItemBackpack;
 import com.sajmonoriginal.betterwithbags.mixin.accessor.MenuAbstractAccessor;
@@ -10,8 +11,6 @@ import com.sajmonoriginal.betterwithbags.slot.SlotBackpackAttachment;
 import com.sajmonoriginal.betterwithbags.util.BackpackMenuCapable;
 import net.minecraft.core.InventoryAction;
 import net.minecraft.core.entity.player.Player;
-import net.minecraft.core.enums.HumanArmorShape;
-import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.player.inventory.container.ContainerInventory;
 import net.minecraft.core.player.inventory.menu.MenuInventory;
@@ -35,12 +34,6 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
     public ContainerInventory inventory;
 
     @Unique
-    private static final int STANDARD_HEIGHT = 166;
-    @Unique
-    private static final int ROW_HEIGHT = 18;
-    @Unique
-    private static final int EXTENSION_TITLE_HEIGHT = 14;
-    @Unique
     private static final int HIDDEN_Y = -9999;
     @Unique
     private static final int HOTBAR_SLOTS_START = 36;
@@ -61,7 +54,7 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
     private SlotBackpackAttachment bwb$attachmentSlot = null;
 
     @Unique
-    private WornBackpackContainer bwb$backpackContainer = null;
+    private ContainerWornBackpack bwb$backpackContainer = null;
 
     @Override
     public boolean betterWithBags$hasBackpackSlots() {
@@ -88,7 +81,7 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
         MenuInventory self = (MenuInventory) (Object) this;
         this.bwb$backpackSlotStartIndex = self.slots.size();
 
-        bwb$backpackContainer = new WornBackpackContainer(inventory);
+        bwb$backpackContainer = new ContainerWornBackpack(inventory);
 
         int maxCapacity = BackpackTier.REINFORCED.getSlots();
         for (int i = 0; i < maxCapacity; i++) {
@@ -108,15 +101,12 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
             return;
         }
 
-        ItemStack chestSlot = inventory.player.inventory.armorInventory[HumanArmorShape.CHEST.getSlotIndex()];
-        boolean hasBackpack = chestSlot != null && chestSlot.getItem() instanceof ItemBackpack;
-
-        if (!hasBackpack) {
+        ItemBackpack backpack = ItemBackpack.getWornBackpack(inventory.player);
+        if (backpack == null) {
             hideBackpackSlots();
             return;
         }
 
-        ItemBackpack backpack = (ItemBackpack) chestSlot.getItem();
         BackpackTier tier = backpack.getTier();
         int capacity = tier.getSlots();
         int rows = tier.getRows();
@@ -130,7 +120,7 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
                 int row = i / 9;
                 int col = i % 9;
                 slot.x = 8 + col * 18;
-                slot.y = STANDARD_HEIGHT + EXTENSION_TITLE_HEIGHT + 1 + row * ROW_HEIGHT;
+                slot.y = BackpackPanelLayout.FIRST_SLOT_Y + row * BackpackPanelLayout.ROW_HEIGHT;
             } else {
                 slot.x = HIDDEN_Y;
                 slot.y = HIDDEN_Y;
@@ -138,8 +128,8 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
         }
 
         if (bwb$attachmentSlot != null && bwb$attachmentSlot.isActive()) {
-            bwb$attachmentSlot.x = 178;
-            bwb$attachmentSlot.y = STANDARD_HEIGHT + EXTENSION_TITLE_HEIGHT + 1;
+            bwb$attachmentSlot.x = BackpackPanelLayout.ATTACHMENT_SLOT_X;
+            bwb$attachmentSlot.y = BackpackPanelLayout.FIRST_SLOT_Y;
         } else if (bwb$attachmentSlot != null) {
             bwb$attachmentSlot.x = HIDDEN_Y;
             bwb$attachmentSlot.y = HIDDEN_Y;

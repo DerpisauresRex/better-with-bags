@@ -4,7 +4,7 @@ import com.mojang.nbt.tags.CompoundTag;
 import com.mojang.nbt.tags.ListTag;
 import com.sajmonoriginal.betterwithbags.block.BackpackBlocks;
 import com.sajmonoriginal.betterwithbags.block.TileEntityBackpack;
-import com.sajmonoriginal.betterwithbags.gui.BagScreens;
+import com.sajmonoriginal.betterwithbags.gui.BackpackGuis;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.entity.player.Player;
@@ -56,7 +56,7 @@ public class ItemBackpack extends Item implements IArmorItem<HumanArmorShape> {
     @Override
     public ItemStack onUse(ItemStack itemStack, World world, Player player) {
         if (!player.isSneaking() && !world.isClientSide) {
-            ((BagScreens) player).betterWithBags$displayBackpackScreen(itemStack);
+            BackpackGuis.openHeld(player);
         }
         return itemStack;
     }
@@ -65,7 +65,7 @@ public class ItemBackpack extends Item implements IArmorItem<HumanArmorShape> {
     public boolean onUseOnBlock(ItemStack itemstack, World world, Player player, TilePosc pos, Side side, double xOffset, double yOffset) {
         if (!player.isSneaking()) {
             if (!world.isClientSide) {
-                ((BagScreens) player).betterWithBags$displayBackpackScreen(itemstack);
+                BackpackGuis.openHeld(player);
             }
             return true;
         }
@@ -120,24 +120,17 @@ public class ItemBackpack extends Item implements IArmorItem<HumanArmorShape> {
     }
 
     public static boolean isWearingBackpack(Player player) {
-        ItemStack chestSlot = player.inventory.armorInventory[HumanArmorShape.CHEST.getSlotIndex()];
-        return chestSlot != null && chestSlot.getItem() instanceof ItemBackpack;
+        return getWornBackpackStack(player) != null;
     }
 
     public static ItemBackpack getWornBackpack(Player player) {
-        ItemStack chestSlot = player.inventory.armorInventory[HumanArmorShape.CHEST.getSlotIndex()];
-        if (chestSlot != null && chestSlot.getItem() instanceof ItemBackpack) {
-            return (ItemBackpack) chestSlot.getItem();
-        }
-        return null;
+        ItemStack backpackStack = getWornBackpackStack(player);
+        return backpackStack != null ? (ItemBackpack) backpackStack.getItem() : null;
     }
 
     public static ItemStack getWornBackpackStack(Player player) {
-        ItemStack chestSlot = player.inventory.armorInventory[HumanArmorShape.CHEST.getSlotIndex()];
-        if (chestSlot != null && chestSlot.getItem() instanceof ItemBackpack) {
-            return chestSlot;
-        }
-        return null;
+        ItemStack chestSlot = player.getItemInArmorSlot(HumanArmorShape.CHEST);
+        return chestSlot != null && chestSlot.getItem() instanceof ItemBackpack ? chestSlot : null;
     }
 
     public static ItemStack[] getBackpackContents(ItemStack backpackStack) {

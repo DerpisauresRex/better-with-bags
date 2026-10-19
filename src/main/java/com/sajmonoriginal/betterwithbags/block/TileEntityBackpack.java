@@ -10,6 +10,7 @@ import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.net.packet.Packet;
 import net.minecraft.core.net.packet.PacketTileEntityData;
+import net.minecraft.core.player.inventory.InventorySorter;
 import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.pos.TilePos;
@@ -150,9 +151,6 @@ public class TileEntityBackpack extends TileEntity implements Container {
 
     @Override
     public boolean stillValid(Player player) {
-        if (worldObj == null) {
-            return true;
-        }
         if (worldObj.getTileEntity(tilePos) != this) {
             return false;
         }
@@ -161,6 +159,8 @@ public class TileEntityBackpack extends TileEntity implements Container {
 
     @Override
     public void sort() {
+        InventorySorter.sortInventory(contents);
+        setChanged();
     }
 
     @Override
