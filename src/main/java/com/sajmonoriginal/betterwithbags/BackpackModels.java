@@ -6,7 +6,6 @@ import com.sajmonoriginal.betterwithbags.block.TileEntityBedroll;
 import com.sajmonoriginal.betterwithbags.item.BackpackItems;
 import com.sajmonoriginal.betterwithbags.item.BackpackTier;
 import com.sajmonoriginal.betterwithbags.model.BlockModelBag;
-import com.sajmonoriginal.betterwithbags.model.ItemModelBackpack;
 import com.sajmonoriginal.betterwithbags.model.ItemModelPlacedBackpack;
 import com.sajmonoriginal.betterwithbags.model.ItemModelPlacedBedroll;
 import com.sajmonoriginal.betterwithbags.render.TileEntityRendererBackpack;
@@ -54,18 +53,12 @@ public class BackpackModels {
     }
 
     public static void initItemModels(ItemModelDispatcher dispatcher) {
-        dispatcher.addDispatch(new ItemModelBackpack(BackpackItems.BACKPACK_SMALL, null)
-            .setIcon(MOD_ID + ":item/backpack_small"));
-        dispatcher.addDispatch(new ItemModelBackpack(BackpackItems.BACKPACK_MEDIUM, null)
-            .setIcon(MOD_ID + ":item/backpack_medium"));
-        dispatcher.addDispatch(new ItemModelBackpack(BackpackItems.BACKPACK_LARGE, null)
-            .setIcon(MOD_ID + ":item/backpack_large"));
-        dispatcher.addDispatch(new ItemModelBackpack(BackpackItems.BACKPACK_REINFORCED, null)
-            .setIcon(MOD_ID + ":item/backpack_reinforced"));
-        dispatcher.addDispatch(new ItemModelBackpack(BackpackItems.BACKPACK_NETHER, null)
-            .setIcon(MOD_ID + ":item/backpack_nether"));
+        for (BackpackTier tier : BackpackTier.values()) {
+            dispatcher.addDispatch(new ItemModelStandard(BackpackItems.getItemForTier(tier), false)
+                .setIcon(MOD_ID + ":item/backpack_" + tier.getName()));
+        }
 
-        dispatcher.addDispatch(new ItemModelStandard(BackpackItems.BEDROLL, null)
+        dispatcher.addDispatch(new ItemModelStandard(BackpackItems.BEDROLL, false)
             .setIcon(MOD_ID + ":item/bedroll"));
 
         for (BackpackTier tier : BackpackTier.values()) {
