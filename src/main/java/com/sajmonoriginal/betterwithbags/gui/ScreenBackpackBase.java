@@ -11,7 +11,6 @@ import net.minecraft.core.lang.I18n;
 @Environment(EnvType.CLIENT)
 public abstract class ScreenBackpackBase extends ScreenContainerAbstract implements ResponsiveBackpackScreen {
     private static final String GUI_TEXTURE_BASE = "/assets/" + BetterWithBagsMod.MOD_ID + "/textures/gui/backpack_";
-    private static final int SCREEN_MARGIN = 8;
 
     protected final MenuBackpackBase menu;
     private final String guiTexture;
@@ -20,8 +19,8 @@ public abstract class ScreenBackpackBase extends ScreenContainerAbstract impleme
     protected ScreenBackpackBase(MenuBackpackBase menu) {
         super(menu);
         this.menu = menu;
-        this.xSize = menu.getTier().supportsAttachment() ? 199 : 176;
-        this.ySize = 121 + menu.getRows() * 18;
+        this.xSize = menu.getTier().supportsAttachment() ? BackpackPanelLayout.MENU_WIDTH_WITH_ATTACHMENT : BackpackPanelLayout.PANEL_WIDTH;
+        this.ySize = 121 + menu.getRows() * BackpackPanelLayout.SLOT_SPACING;
         this.guiTexture = GUI_TEXTURE_BASE + menu.getTier().getName() + ".png";
     }
 
@@ -37,8 +36,9 @@ public abstract class ScreenBackpackBase extends ScreenContainerAbstract impleme
         int guiLeft = (this.width - this.xSize) / 2;
         int guiTop = (this.height - this.ySize) / 2;
 
-        this.drawTexturedModalRect(guiLeft, guiTop + rows * 18 + 17, 0, 118, 176, 103);
-        this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, 176, rows * 18 + 17 + 7);
+        int rowsHeight = rows * BackpackPanelLayout.SLOT_SPACING;
+        this.drawTexturedModalRect(guiLeft, guiTop + rowsHeight + 17, 0, 118, BackpackPanelLayout.PANEL_WIDTH, 103);
+        this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, BackpackPanelLayout.PANEL_WIDTH, rowsHeight + 17 + 7);
 
         if (menu.getTier().supportsAttachment()) {
             this.drawTexturedModalRect(guiLeft + 174, guiTop + 13, 174, 13, 25, 26);
@@ -66,9 +66,7 @@ public abstract class ScreenBackpackBase extends ScreenContainerAbstract impleme
 
     @Override
     public float betterWithBags$getGuiScale() {
-        float horizontalScale = (this.width - SCREEN_MARGIN * 2) / (float) this.xSize;
-        float verticalScale = (this.height - SCREEN_MARGIN * 2) / (float) this.ySize;
-        return Math.min(1.0F, Math.min(horizontalScale, verticalScale));
+        return ResponsiveScreens.getFitScale(this, this.xSize, this.ySize);
     }
 
     @Override

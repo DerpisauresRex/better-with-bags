@@ -21,7 +21,8 @@ public class MenuBackpack extends MenuBackpackBase {
         this.playerInventory = playerInventory;
         this.heldSlotIndex = slotIndex;
         this.backpackContainer = new ContainerHeldBackpack(playerInventory, slotIndex, tier);
-        addBackpackSlots(backpackContainer, new SlotAttachment(playerInventory, heldSlotIndex, 178, 18), playerInventory);
+        addBackpackSlots(backpackContainer, new SlotAttachment(playerInventory, heldSlotIndex,
+            BackpackPanelLayout.ATTACHMENT_SLOT_X, BackpackPanelLayout.MENU_SLOTS_TOP), playerInventory);
 
         Slot heldSlot = this.getSlotFor(playerInventory, heldSlotIndex);
         this.heldMenuSlot = heldSlot != null ? heldSlot.index : -1;
@@ -29,7 +30,8 @@ public class MenuBackpack extends MenuBackpackBase {
 
     private static BackpackTier getTierAt(ContainerInventory playerInventory, int slotIndex) {
         ItemStack stack = playerInventory.mainInventory[slotIndex];
-        return stack != null && stack.getItem() instanceof ItemBackpack ? ((ItemBackpack) stack.getItem()).getTier() : BackpackTier.SMALL;
+        BackpackTier tier = ItemBackpack.getBackpackTier(stack);
+        return tier != null ? tier : BackpackTier.SMALL;
     }
 
     public ItemStack getBackpackStack() {
@@ -84,8 +86,6 @@ public class MenuBackpack extends MenuBackpackBase {
     }
 
     private boolean isBackpackInSlot() {
-        ItemStack current = playerInventory.mainInventory[heldSlotIndex];
-        return current != null && current.getItem() instanceof ItemBackpack &&
-            ((ItemBackpack) current.getItem()).getTier() == this.tier;
+        return ItemBackpack.getBackpackTier(playerInventory.mainInventory[heldSlotIndex]) == this.tier;
     }
 }

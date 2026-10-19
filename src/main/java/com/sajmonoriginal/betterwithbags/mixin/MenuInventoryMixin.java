@@ -9,6 +9,8 @@ import com.sajmonoriginal.betterwithbags.mixin.accessor.MenuAbstractAccessor;
 import com.sajmonoriginal.betterwithbags.slot.SlotBackpack;
 import com.sajmonoriginal.betterwithbags.slot.SlotBackpackAttachment;
 import com.sajmonoriginal.betterwithbags.util.BackpackMenuCapable;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.core.InventoryAction;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.player.inventory.container.Container;
@@ -22,9 +24,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,9 +33,11 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
     public ContainerInventory inventory;
 
     @Unique
-    private static final int HIDDEN_Y = -9999;
+    private static final int BWB_HIDDEN_POS = -9999;
     @Unique
-    private static final int HOTBAR_SLOTS_START = 36;
+    private static final int BWB_FIRST_INVENTORY_SLOT = 9;
+    @Unique
+    private static final int BWB_LAST_HOTBAR_SLOT = 44;
 
     @Unique
     private boolean bwb$hasBackpackSlots = false;
@@ -61,20 +62,6 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
         return this.bwb$hasBackpackSlots;
     }
 
-    @Override
-    public int betterWithBags$getBackpackSlotStartIndex() {
-        return this.bwb$backpackSlotStartIndex;
-    }
-
-    @Override
-    public int betterWithBags$getBackpackRows() {
-        return this.bwb$backpackRows;
-    }
-
-    public int getHotbarSlotId(int number) {
-        return HOTBAR_SLOTS_START + number - 1;
-    }
-
     @Inject(method = "<init>(Lnet/minecraft/core/player/inventory/container/ContainerInventory;)V",
             at = @At("RETURN"))
     private void bwb$addBackpackSlotsInConstructor(ContainerInventory inventory, CallbackInfo ci) {
@@ -85,25 +72,25 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
 
         int maxCapacity = BackpackTier.REINFORCED.getSlots();
         for (int i = 0; i < maxCapacity; i++) {
-            SlotBackpack slot = new SlotBackpack(bwb$backpackContainer, inventory, i, HIDDEN_Y, HIDDEN_Y);
+            SlotBackpack slot = new SlotBackpack(bwb$backpackContainer, inventory, i, BWB_HIDDEN_POS, BWB_HIDDEN_POS);
             bwb$backpackSlots.add(slot);
             ((MenuAbstractAccessor) this).invokeAddSlot(slot);
         }
 
-        bwb$attachmentSlot = new SlotBackpackAttachment(inventory, HIDDEN_Y, HIDDEN_Y);
+        bwb$attachmentSlot = new SlotBackpackAttachment(inventory, BWB_HIDDEN_POS, BWB_HIDDEN_POS);
         ((MenuAbstractAccessor) this).invokeAddSlot(bwb$attachmentSlot);
     }
 
     @Override
     public void betterWithBags$refreshBackpackSlots() {
         if (inventory == null || inventory.player == null) {
-            hideBackpackSlots();
+            bwb$hideBackpackSlots();
             return;
         }
 
         ItemBackpack backpack = ItemBackpack.getWornBackpack(inventory.player);
         if (backpack == null) {
-            hideBackpackSlots();
+            bwb$hideBackpackSlots();
             return;
         }
 
@@ -119,11 +106,11 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
             if (i < capacity) {
                 int row = i / 9;
                 int col = i % 9;
-                slot.x = 8 + col * 18;
+                slot.x = BackpackPanelLayout.SLOTS_LEFT + col * BackpackPanelLayout.SLOT_SPACING;
                 slot.y = BackpackPanelLayout.FIRST_SLOT_Y + row * BackpackPanelLayout.ROW_HEIGHT;
             } else {
-                slot.x = HIDDEN_Y;
-                slot.y = HIDDEN_Y;
+                slot.x = BWB_HIDDEN_POS;
+                slot.y = BWB_HIDDEN_POS;
             }
         }
 
@@ -131,8 +118,8 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
             bwb$attachmentSlot.x = BackpackPanelLayout.ATTACHMENT_SLOT_X;
             bwb$attachmentSlot.y = BackpackPanelLayout.FIRST_SLOT_Y;
         } else if (bwb$attachmentSlot != null) {
-            bwb$attachmentSlot.x = HIDDEN_Y;
-            bwb$attachmentSlot.y = HIDDEN_Y;
+            bwb$attachmentSlot.x = BWB_HIDDEN_POS;
+            bwb$attachmentSlot.y = BWB_HIDDEN_POS;
         }
     }
 
@@ -146,19 +133,24 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
     }
 
     @Unique
-    private void hideBackpackSlots() {
+    private void bwb$hideBackpackSlots() {
         this.bwb$hasBackpackSlots = false;
         this.bwb$backpackRows = 0;
 
         for (SlotBackpack slot : bwb$backpackSlots) {
-            slot.x = HIDDEN_Y;
-            slot.y = HIDDEN_Y;
+            slot.x = BWB_HIDDEN_POS;
+            slot.y = BWB_HIDDEN_POS;
         }
 
         if (bwb$attachmentSlot != null) {
-            bwb$attachmentSlot.x = HIDDEN_Y;
-            bwb$attachmentSlot.y = HIDDEN_Y;
+            bwb$attachmentSlot.x = BWB_HIDDEN_POS;
+            bwb$attachmentSlot.y = BWB_HIDDEN_POS;
         }
+    }
+
+    @Unique
+    private static boolean bwb$isPlayerInventorySlot(int index) {
+        return index >= BWB_FIRST_INVENTORY_SLOT && index <= BWB_LAST_HOTBAR_SLOT;
     }
 
     @ModifyReturnValue(method = "getTargetSlots", at = @At("RETURN"))
@@ -167,12 +159,12 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
         if (original == null || !bwb$hasBackpackSlots || bwb$backpackSlotStartIndex < 0) {
             return original;
         }
-        if (slot.index < 9 || slot.index > 44) {
+        if (!bwb$isPlayerInventorySlot(slot.index)) {
             return original;
         }
         for (int i = 0; i < original.size(); i++) {
             int index = original.getInt(i);
-            if (index < 9 || index > 44) {
+            if (!bwb$isPlayerInventorySlot(index)) {
                 return original;
             }
         }

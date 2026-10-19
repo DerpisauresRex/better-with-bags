@@ -3,6 +3,7 @@ package com.sajmonoriginal.betterwithbags.recipe;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.sajmonoriginal.betterwithbags.BetterWithBagsMod;
 import com.sajmonoriginal.betterwithbags.item.ItemBackpack;
 import net.minecraft.core.data.registry.recipe.HasJsonAdapter;
 import net.minecraft.core.data.registry.recipe.RecipeSymbol;
@@ -15,7 +16,7 @@ import net.minecraft.core.player.inventory.container.ContainerCrafting;
 import java.lang.reflect.Type;
 
 public class RecipeEntryBackpackUpgrade extends RecipeEntryCraftingShaped implements HasJsonAdapter {
-    public static final String TYPE = "betterwithbags:crafting/backpack_upgrade";
+    public static final String TYPE = BetterWithBagsMod.MOD_ID + ":crafting/backpack_upgrade";
 
     public RecipeEntryBackpackUpgrade() {
         super();
@@ -30,9 +31,8 @@ public class RecipeEntryBackpackUpgrade extends RecipeEntryCraftingShaped implem
         if (!super.matches(crafting)) {
             return false;
         }
-        ItemStack source = findBackpack(crafting);
         int capacity = ((ItemBackpack) getOutput().getItem()).getCapacity();
-        return source == null || ItemBackpack.getOccupiedSlotCount(source) <= capacity;
+        return ItemBackpack.getOccupiedSlotCount(findBackpack(crafting)) <= capacity;
     }
 
     @Override
