@@ -1,50 +1,88 @@
 # Better With Bags
 
-You know what's annoying? Having 27 stacks of cobblestone, 4 different pickaxes, some redstone you'll "use later," and absolutely nowhere to put any of it. Your inventory is full before you even leave the cave.
+[![GitHub release](https://img.shields.io/github/v/release/MinecraftLabs/better-with-bags?color=brown)](https://github.com/MinecraftLabs/better-with-bags/releases)
+[![GitHub Downloads](https://img.shields.io/github/downloads/MinecraftLabs/better-with-bags/total?color=brown)](https://github.com/MinecraftLabs/better-with-bags/releases)
+[![Modrinth Downloads](https://img.shields.io/modrinth/dt/better-with-bags?color=brown&logo=modrinth)](https://modrinth.com/mod/better-with-bags)
 
-**So I made backpacks.**
+Backpacks for Better Than Adventure.
 
-Better With Bags adds wearable, placeable storage to [Better Than Adventure](https://www.betterthanadventure.net/). Craft a small leather satchel, throw it on your back, and suddenly you have room to breathe. Upgrade it as you go. By endgame you're walking around with 36 extra slots strapped to your back. Everything from the recipes to the textures was made to fit the BTA style, so it feels like it was always part of the game.
+Wear a backpack in the chestplate slot and your inventory gets extra rows. Hold one in your hand to open it, or put it down in the world like a chest. Each tier is crafted from the one before it, and the recipes and textures are made to fit the rest of BTA.
+
+Works in singleplayer and on servers.
 
 <p align="center">
-  <img src="assets/backpacks_placed.png" width="80%" alt="All 5 backpack tiers placed in the world">
+  <img src="assets/backpacks_placed.png" width="80%" alt="All five backpacks placed in the world">
+  <br>
+  <em>All five backpacks, from the Small Leather Satchel to the Nether Explorer's Pack.</em>
 </p>
 
-## What does this mod do?
+## Backpacks
 
-Adds 5 tiers of backpacks. Equip one in the chestplate slot and your inventory screen extends with extra rows at the bottom. No separate GUI, no keybind to open it. Just open your inventory and the backpack slots are right there. You can also hold a backpack in your hand and right-click to peek inside, sneak + right-click on a block to place it in the world, or sneak + right-click a placed backpack to pick it back up. Contents always stay inside.
+| Backpack | Slots | Bedroll slot | Movement |
+|----------|-------|--------------|----------|
+| Small Leather Satchel | 9 | no | normal |
+| Medium Leather Backpack | 18 | no | normal |
+| Large Leather Backpack | 27 | yes | up to 10% slower |
+| Reinforced Traveler's Pack | 36 | yes | up to 15% slower |
+| Nether Explorer's Pack | 27 | yes | normal, fireproof |
 
-## Features
+The slowdown depends on how full the backpack is. An empty backpack doesn't slow you down.
 
-### Backpack Tiers
+<p align="center">
+  <img src="assets/gallery/satchel.png" width="49%" alt="Small Leather Satchel">
+  <img src="assets/gallery/medium.png" width="49%" alt="Medium Leather Backpack">
+  <img src="assets/gallery/large.png" width="49%" alt="Large Leather Backpack">
+  <img src="assets/gallery/reinforced.png" width="49%" alt="Reinforced Traveler's Pack">
+  <img src="assets/gallery/nether.png" width="49%" alt="Nether Explorer's Pack">
+</p>
 
-Five tiers, each crafted from the previous one:
+### Wearing
 
-| Tier | Slots | Speed | Notes |
-|------|-------|-------|-------|
-| Small | 9 | normal | starter bag |
-| Medium | 18 | normal | |
-| Large | 27 | up to -10% | slows based on how full it is |
-| Reinforced | 36 | up to -15% | slows based on how full it is |
-| Nether | 27 | normal | fire resistant |
+Put a backpack in the chestplate slot and its slots appear under your inventory, in creative too. The backpack is drawn on your back, with the bedroll if one is attached.
 
-### Wearable
+<p align="center">
+  <img src="assets/backpack_inventory.png" width="80%" alt="Backpack slots under the player inventory">
+  <br>
+  <em>A worn Large Leather Backpack adds three rows under the inventory.</em>
+</p>
 
-Equip in the chestplate armor slot. Right-click to open the backpack inventory. A 3D model renders on the player in both first and third person.
+<p align="center">
+  <img src="assets/backpack_worn_front.png" width="25%" alt="Player wearing a backpack, front">
+  <img src="assets/backpack_worn_back.png" width="25%" alt="Player wearing a backpack, back">
+</p>
 
-### Placeable
+### Holding
 
-Sneak + right-click to place your backpack as a block. It works like a chest. Break it to pick it back up with everything still inside.
+Right-click with a backpack in your hand to open it.
 
-### Speed Penalty
+### Placing
 
-Large and Reinforced backpacks slow you down, but only when they have items in them. An empty Large backpack has zero penalty. Fill all 27 slots and you lose 10% movement speed. Reinforced goes up to 15%. Small, Medium and Nether have no penalty at all.
+Sneak and right-click a block to place the backpack. Right-click it to open it, or sneak and right-click to pick it back up. Breaking it drops the backpack with everything still inside.
 
-## Dependencies
+### Upgrading
 
-- [Babric](https://github.com/Turnip-Labs/babric-instance-fabric/releases)
-- [HalpLibe](https://github.com/Turnip-Labs/bta-halplibe/releases)
-- [Catalyst Core](https://github.com/MartinSVK12/catalyst/releases) (also included in Catalyst All)
+Craft a backpack together with the materials of the next tier to upgrade it. The contents, bedroll and name carry over.
+
+### Bedroll
+
+A bed you can carry. You sleep in it like in a normal bed, but it doesn't set your spawn. Like a normal bed, it explodes in the Nether. Large, Reinforced and Nether backpacks have a slot to carry one.
+
+<p align="center">
+  <img src="assets/gallery/bedroll.png" width="80%" alt="Bedroll placed and attached to a backpack">
+</p>
+
+### Other details
+
+- Rename a backpack with a label and the name shows in its screen, also when it is placed.
+- The sort key sorts backpack contents.
+- Dropped backpacks don't despawn.
+- The Nether Explorer's Pack floats up out of lava.
+
+## Requirements
+
+- BTA == 8.0.1
+- HalpLibe >= [6.2.0+8.0.1](https://github.com/Turnip-Labs/bta-halplibe/releases)
+- Catalyst Core >= [3.0.5](https://github.com/MartinSVK12/catalyst/releases), also included in [Catalyst All](https://modrinth.com/mod/catalyst)
 
 ## Credits
 

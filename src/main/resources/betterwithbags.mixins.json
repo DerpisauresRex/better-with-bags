@@ -17,6 +17,7 @@
 	"client": [
 		"client.HudComponentArmorBarMixin",
 		"client.MobRendererPlayerMixin",
+		"client.RecipePageCraftingMixin",
 		"client.ScreenContainerAbstractMixin",
 		"client.ScreenInventoryMixin",
 		"client.ScreenInventoryCreativeMixin",
