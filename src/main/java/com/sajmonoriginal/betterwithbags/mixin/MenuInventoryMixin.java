@@ -13,6 +13,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.core.InventoryAction;
 import net.minecraft.core.entity.player.Player;
+import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.player.inventory.container.ContainerInventory;
 import net.minecraft.core.player.inventory.menu.MenuInventory;
@@ -38,6 +39,8 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
     private static final int BWB_FIRST_INVENTORY_SLOT = 9;
     @Unique
     private static final int BWB_LAST_HOTBAR_SLOT = 44;
+    @Unique
+    private static final int BWB_ARMOR_TARGET = 2;
 
     @Unique
     private boolean bwb$hasBackpackSlots = false;
@@ -153,8 +156,26 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
         return index >= BWB_FIRST_INVENTORY_SLOT && index <= BWB_LAST_HOTBAR_SLOT;
     }
 
+    @Unique
+    private boolean bwb$hasFreeSlot(IntList targets, ItemStack stack) {
+        if (targets == null) {
+            return false;
+        }
+        for (int i = 0; i < targets.size(); i++) {
+            Slot target = ((MenuInventory) (Object) this).getSlot(targets.getInt(i));
+            if (target != null && !target.hasItem() && target.mayPlace(stack)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @ModifyReturnValue(method = "getTargetSlots", at = @At("RETURN"))
     private IntList bwb$addBackpackTargets(IntList original, InventoryAction action, Slot slot, int target, Player player) {
+        if (target == BWB_ARMOR_TARGET && bwb$isPlayerInventorySlot(slot.index) && slot.getItemStack() != null
+                && slot.getItemStack().getItem() instanceof ItemBackpack && !bwb$hasFreeSlot(original, slot.getItemStack())) {
+            return ((MenuInventory) (Object) this).getTargetSlots(action, slot, 0, player);
+        }
         betterWithBags$refreshBackpackSlots();
         if (original == null || !bwb$hasBackpackSlots || bwb$backpackSlotStartIndex < 0) {
             return original;
