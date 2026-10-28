@@ -14,6 +14,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+//** Config Logic*/
+import com.sajmonoriginal.betterwithbags.BetterWithBagsMod;
 
 @Mixin(value = Player.class, remap = false)
 public abstract class PlayerMixin extends Entity {
@@ -22,24 +24,49 @@ public abstract class PlayerMixin extends Entity {
         super(world);
     }
 
+
+    //** Config logic to enable/disable and modify percentage values of penalties from config*/
     @Inject(method = "onLivingUpdate", at = @At("TAIL"))
     private void bwb$applyBackpackSpeedPenalty(CallbackInfo ci) {
         Player self = (Player) (Object) this;
 
-        ItemStack backpackStack = ItemBackpack.getWornBackpackStack(self);
+        boolean worn = ItemBackpack.isWearingBackpack(self);
+        if (worn && !BetterWithBagsMod.wornBagHasPenalty) return;
+        if (!worn && !BetterWithBagsMod.carriedBagPenalty) return;
+
+        ItemStack backpackStack = ItemBackpack.findBackpackStack(self);
         if (backpackStack == null) return;
 
         ItemBackpack backpack = (ItemBackpack) backpackStack.getItem();
-        if (!backpack.getTier().hasSpeedPenalty()) return;
+        float maxPenalty = BetterWithBagsMod.getMaxSpeedPenalty(backpack.getTier());
+        if (maxPenalty <= 0f) return;
 
         int occupied = ItemBackpack.getOccupiedSlotCount(backpackStack);
         int capacity = backpack.getCapacity();
         if (occupied <= 0 || capacity <= 0) return;
 
         float fillRatio = (float) occupied / capacity;
-        float maxPenalty = 1.0f - backpack.getTier().getSpeedMultiplier();
         this.speed *= (1.0f - fillRatio * maxPenalty);
     }
+
+
+    // This logic was added to drop bag if multiple are present
+    @Inject(method = "onLivingUpdate", at = @At("TAIL"))
+    private void bwb$enforceSingleBackpack(CallbackInfo ci) {
+        if (this.world.isClientSide || !BetterWithBagsMod.oneBagLimit) return; // added oneBagLimit config logic here
+        Player self = (Player) (Object) this;
+
+        boolean haveOne = ItemBackpack.isWearingBackpack(self); // worn bag wins
+        ItemStack[] inv = self.inventory.mainInventory;
+        for (int i = 0; i < inv.length; i++) {
+            ItemStack s = inv[i];
+            if (!ItemBackpack.isBackpack(s)) continue;
+            if (!haveOne) { haveOne = true; continue; }  // keep the first one found
+            inv[i] = null;
+            self.dropPlayerItem(s);  // contents live in the stack's NBT, so nothing is lost
+    }
+}
+
 
     @WrapWithCondition(
         method = "sleepInBedAt",

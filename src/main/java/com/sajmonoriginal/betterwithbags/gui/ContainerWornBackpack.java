@@ -18,7 +18,7 @@ public class ContainerWornBackpack extends ContainerBackpackContents {
     @Override
     protected void refresh() {
         Player player = playerInventory.player;
-        ItemStack backpackStack = player != null ? ItemBackpack.getWornBackpackStack(player) : null;
+        ItemStack backpackStack = player != null ? ItemBackpack.getCarriedBackpackStack(player) : null;
         if (backpackStack != trackedBackpackStack) {
             trackedBackpackStack = backpackStack;
             contents = backpackStack != null ? ItemBackpack.getBackpackContents(backpackStack) : new ItemStack[0];

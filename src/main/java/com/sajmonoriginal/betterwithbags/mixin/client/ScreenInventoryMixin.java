@@ -34,7 +34,7 @@ public abstract class ScreenInventoryMixin extends ScreenContainerAbstract imple
     @Unique
     private BackpackTier bwb$getWornTier() {
         if (this.mc == null || this.mc.thePlayer == null) return null;
-        return ItemBackpack.getBackpackTier(ItemBackpack.getWornBackpackStack(this.mc.thePlayer));
+        return ItemBackpack.getBackpackTier(ItemBackpack.getCarriedBackpackStack(this.mc.thePlayer));
     }
 
     @Unique
@@ -111,7 +111,7 @@ public abstract class ScreenInventoryMixin extends ScreenContainerAbstract imple
     @Inject(method = "drawGuiContainerBackgroundLayer", at = @At("HEAD"))
     private void bwb$drawBackpackPanel(float partialTicks, CallbackInfo ci) {
         if (this.bwb$currentTier != null) {
-            BackpackInventoryPanel.draw(this, this.bwb$currentTier, ItemBackpack.getWornBackpackStack(this.mc.thePlayer));
+            BackpackInventoryPanel.draw(this, this.bwb$currentTier, ItemBackpack.getCarriedBackpackStack(this.mc.thePlayer));
         }
     }
 }

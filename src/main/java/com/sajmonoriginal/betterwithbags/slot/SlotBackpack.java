@@ -28,7 +28,7 @@ public class SlotBackpack extends Slot {
     public boolean isActive() {
         Player player = playerInventory.player;
         if (player == null) return false;
-        ItemStack backpackStack = ItemBackpack.getWornBackpackStack(player);
+        ItemStack backpackStack = ItemBackpack.getCarriedBackpackStack(player);
         if (backpackStack == null) return false;
         ItemBackpack backpack = (ItemBackpack) backpackStack.getItem();
         return backpackSlotIndex < backpack.getCapacity();

@@ -91,7 +91,7 @@ public abstract class MenuInventoryMixin implements BackpackMenuCapable {
             return;
         }
 
-        ItemBackpack backpack = ItemBackpack.getWornBackpack(inventory.player);
+        ItemBackpack backpack = ItemBackpack.getCarriedBackpack(inventory.player);
         if (backpack == null) {
             bwb$hideBackpackSlots();
             return;

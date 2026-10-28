@@ -22,6 +22,8 @@ import net.minecraft.core.world.pos.TilePosc;
 
 import java.util.ArrayList;
 import java.util.List;
+//** Added to accomodate Config options*/
+import com.sajmonoriginal.betterwithbags.BetterWithBagsMod;
 
 public class ItemBackpack extends Item implements IArmorItem<HumanArmorShape> {
 
@@ -202,4 +204,40 @@ public class ItemBackpack extends Item implements IArmorItem<HumanArmorShape> {
     public static boolean hasAttachment(ItemStack backpackStack) {
         return getAttachment(backpackStack) != null;
     }
+
+    /** Worn bag first, otherwise the first bag in the main inventory. No config. Used by the weight penalty. */
+    public static ItemStack findBackpackStack(Player player) {
+        ItemStack worn = getWornBackpackStack(player);
+        if (worn != null) return worn;
+        for (ItemStack s : player.inventory.mainInventory) {
+            if (s != null && s.getItem() instanceof ItemBackpack) return s;
+        }
+        return null;
+    }
+
+    /** Used by the inventory screen: the worn bag, or an unworn one only if the config allows it. */
+    public static ItemStack getCarriedBackpackStack(Player player) {
+        ItemStack worn = getWornBackpackStack(player);
+        if (worn != null) return worn;
+        return BetterWithBagsMod.showContentsWhenCarried ? findBackpackStack(player) : null;
+    }
+
+
+    /** How many bag items the player is carrying (worn + main inventory).  Ryan Added this*/
+    public static int countCarriedBackpacks(Player player) {
+        int n = isWearingBackpack(player) ? 1 : 0;
+        for (ItemStack s : player.inventory.mainInventory) {
+            if (isBackpack(s)) n++;
+        }
+        return n;
+    }
+
+    /** Supports added functionality of having additional inventory slots shown while back is in inventory instead of only while equipped*/
+    public static ItemBackpack getCarriedBackpack(Player player) {
+    ItemStack s = getCarriedBackpackStack(player);
+    return s != null ? (ItemBackpack) s.getItem() : null;
+}
+
+
+
 }
